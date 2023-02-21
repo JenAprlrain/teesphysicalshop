@@ -1,38 +1,207 @@
-.App {
+body {
+  background-color: #b3b1b1;
+}
+
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.title {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.connect-wallet {
+  text-align: center;
+  margin-top: 50px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.connect-button {
+  background-color: red;
+  color: white;
+  border: none;
+  font-size: 24px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 5px #353333;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.connect-button:hover {
+  cursor: pointer;
+}
+
+.wallet-info {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.card {
+  background-color: white;
+  border: 1px solid black;
+  box-shadow: 5px 5px 5px #353333;
+  margin-bottom: 30px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.card-text {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.purchase-tee {
+  text-align: center;
+}
+
+.purchase-button {
+  background-color: red;
+  color: white;
+  border: none;
+  font-size: 24px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 5px #353333;
+}
+
+.purchase-button:hover {
+  cursor: pointer;
+}
+
+
+.no-nfts {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.no-nfts-text {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+a {
+  font-size: 24px;
+}
+
+p {
+  font-size: 24px;
+}
+
+.owned-nfts {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.owned-nfts-text {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.nft-list {
+  position: relative;
+  color: black;
+}
+
+
+.nft-card {
+  position: relative;
+  display: block;
+  width: 25%;
+  height: 250px;
+  background-color: white;
+  border: 1px solid black;
+  box-shadow: 5px 5px 5px #353333;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+
+.nft-card img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  border-radius: 10px 10px 0 0;
+}
+
+
+.nft-card p {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  margin: 0;
+}
+
+.form-group label,
+.form-group input {
+  font-size: 1.5em;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group select {
+  margin-left: 8px;
+}
+
+.required {
+  color: red;
+}
+
+.form-container {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: left;
+}
+.form-group {
+  display: flex;
   align-items: center;
+  justify-content: flex-end;
+}
+
+select {
+  width: 300px;
+}
+
+.no-metamask {
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.no-metamask-image {
+  max-width: 100px;
+  max-height: 100px;
+}
+
+.no-metamask-text {
+  text-align: center;
+}
+
+.popup {
+  background-color: red;
   color: white;
+  padding: 1rem;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
