@@ -7,8 +7,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import metamaskfox from './images/MetaMask_Fox.png';
-import emailjs from 'emailjs-com';
-import Modal from 'react-modal';
+import emailjs from "emailjs-com";
+import { countryOptions } from './countries';
 
 function MyComponent() {
   const [account, setAccount] = useState('');
@@ -31,7 +31,7 @@ function MyComponent() {
   const [Contract, setContract] = useState(null);
   const [haveMetamask, setHaveMetamask] = useState(true);
   const [formSubmitted, setFormSubmitted] = useState(false);
-
+  const [orderData, setOrderData] = useState(null);
 
   useEffect(() => {
     if (Contract) {
@@ -57,7 +57,7 @@ function MyComponent() {
         setBalance(balanceInEth);
 
         // Check if the wallet has NFTs
-        const ContractAddress = '0x633763D9174d6B772676920b2309b39eE3A92a8a';
+        const ContractAddress = '0x3D4B2e54462C509b6cecA9A02C76c71a286c7e15';
         const Contract = new web3.eth.Contract(ABI, ContractAddress);
         const numTokens = await Contract.methods.balanceOf(walletaddress).call();
         setHasNFT(numTokens > 0);
@@ -151,17 +151,6 @@ useEffect(() => {
       // Handle any errors
     }
   }
-  const purchaseTee = async () => {
-    try {
-      const web3 = new Web3(window.ethereum);
-      const teeshopAddress = '0x123...'; // Replace with your smart contract address
-      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
-      const result = await teeshopContract.methods.purchaseTee().send({ value: '40000000000000000' }); // 40 FTM in wei
-      setHasPurchasedTee(true);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const settings = {
     dots: true,
@@ -171,37 +160,108 @@ useEffect(() => {
     slidesToScroll: 1
   };
 
+  const purchaseTee = async (event) => {
+    event.preventDefault(); // prevent the form from being submitted
+
+    let TransactionId = null;
+
+    try {
+      const web3 = new Web3(window.ethereum);
+  
+      // Get the user's account address
+      const accounts = await web3.eth.getAccounts();
+      const walletaddress = accounts[0];
+  
+      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
+      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
+      const formData = new FormData(form.current);
+  
+      const eventPromise = new Promise((resolve, reject) => {
+        teeshopContract.events.NewOrder({ fromBlock: 'latest' }, (error, event) => {
+          if (error) {
+            reject(error);
+          }
+          const { orderId, buyer, fulfilled, } = event.returnValues;
+          const orderTime = new Date(event.returnValues.orderTime * 1000).toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            hour12: true,
+            timeZoneName: 'short'
+          });
+          console.log('NewOrder event data:', { orderId, buyer, orderTime, fulfilled });
+          setOrderData({ orderId, buyer, orderTime, fulfilled });
+  
+          // add the event data to the form data
+          const formData = new FormData(form.current);
+          formData.append('orderId', orderId);
+          formData.append('buyer', buyer);
+          formData.append('orderTime', orderTime);
+          formData.append('fulfilled', fulfilled);
+          formData.append('TransactionId', TransactionId)
+
+          for (const [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+          }
+          const plainFormData = Object.fromEntries(formData.entries());
+  
+          // send the form data using EmailJS
+          emailjs.send('service_jsb1jvd', 'template_exkkure', plainFormData , 'EdVmKYzMYfGhzMdGy')
+  .then((result) => {
+    console.log("Email sent successfully:", result.text);
+  })
+  .catch((error) => {
+    console.error("Error sending email:", error);
+  })
+  .finally(() => {
+    // reset form values after submission
+    setName('');
+    setEmail('');
+    setAddress('');
+    setAddress2('');
+    setCity('');
+    setState('');
+    setZipcode('');
+    setCountry('');
+    setShirtSize('');
+    setFormSubmitted(true);
+    setHasPurchasedTee(true);
+    if (form.current) {
+      form.current.reset();
+      console.log('Form data after reset:', new FormData(form.current));
+    }
+  });
+  
+          resolve();
+        });
+      });
+
+      const country = formData.get('country');
+      console.log('Country:', country);
+
+      let result, TransactionId;
+      if (country === 'US') {
+        result = await teeshopContract.methods.buyTee().send({ from: walletaddress, value: web3.utils.toWei("1", "ether") });
+      } else {
+        result = await teeshopContract.methods.buyTeeI().send({ from: walletaddress, value: web3.utils.toWei("2", "ether") });
+      }
+      TransactionId = result.transactionHash;
+      console.log('Transaction Hash:', TransactionId);
+      
+      await eventPromise;
+      setHasPurchasedTee(true);
+  
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
   
     const form = useRef(); // create a reference to the form element
-  
-  
-    const handleSubmit = (event) => {
-      event.preventDefault(); // prevent the default form submission behavior
-    
-      // send the form data using EmailJS
-      emailjs.sendForm('service_jsb1jvd', 'template_exkkure', form.current, 'EdVmKYzMYfGhzMdGy')
-        .then((result) => {
-          console.log("Email sent successfully:", result.text);
-        })
-        .catch((error) => {
-          console.error("Error sending email:", error);
-        })
-        .finally(() => {
-          // reset form values after submission
-          setName('');
-          setEmail('');
-          setAddress('');
-          setAddress2('');
-          setCity('');
-          setState('');
-          setZipcode('');
-          setCountry('');
-          setShirtSize('');
-          setFormSubmitted(true);
-          setHasPurchasedTee(true);
-          form.current.reset();
-        });
-    };
     
   return (
     <div className="container">
@@ -259,7 +319,7 @@ useEffect(() => {
       <br></br>
       {hasNFT && !hasPurchasedTee && (
         <div className="purchase-tee">
-        <form ref={form} onSubmit={handleSubmit}>
+        <form ref={form} onSubmit={purchaseTee}>
       <div className="form-container">
   <div className="form-group">
     <label htmlFor="name">Name:&nbsp;<span className="required">*&nbsp;</span></label>
@@ -290,9 +350,16 @@ useEffect(() => {
     <input type="text" name="zipcode" onChange={(event) => setZipcode(event.target.value)} required />
   </div>
   <div className="form-group">
-    <label htmlFor="coutry">Country:&nbsp;<span className="required">*&nbsp;</span></label>
-    <input type="text" name="country" onChange={(event) => setCountry(event.target.value)} required />
-  </div>
+  <label htmlFor="country">Country:&nbsp;<span className="required">*&nbsp;</span></label>
+  <select name="country" onChange={(event) => setCountry(event.target.value)} required style={{ fontSize: '20px' }} defaultValue="United States">
+  <option value="">Select country</option>
+  {countryOptions.map((country) => (
+    <option key={country.value} value={country.value}>
+      {country.label}
+    </option>
+  ))}
+</select>
+</div>
   <div className="form-group">
     <label htmlFor="shirtSize">Shirt Size:<span className="required">*&nbsp;</span></label>
     <select name="shirtSize" onChange={(event) => setShirtSize(event.target.value)} required style={{ fontSize: '20px' }}>
@@ -307,7 +374,7 @@ useEffect(() => {
  <br></br>
   <br></br>
           <button className="purchase-button" type="submit">
-            Purchase TEE for 40 FTM
+            Purchase TEE
           </button>
           </form>
         </div>
