@@ -9,6 +9,7 @@ import "slick-carousel/slick/slick-theme.css";
 import metamaskfox from './images/MetaMask_Fox.png';
 import emailjs from "emailjs-com";
 import { countryOptions } from './countries';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function MyComponent() {
   const [account, setAccount] = useState('');
@@ -16,7 +17,8 @@ function MyComponent() {
   const [isConnected, setIsConnected] = useState(false);
   const [hasNFT, setHasNFT] = useState(false);
   const [hasPurchasedTee, setHasPurchasedTee] = useState(false);
-  const [name, setName] = useState('');
+  const [firstname, setFirstName] = useState('');
+  const [lastname, setLastName] = useState('');
   const [address, setAddress] = useState('');
   const [address2, setAddress2] = useState('');
   const [shirtSize, setShirtSize] = useState('');
@@ -32,12 +34,17 @@ function MyComponent() {
   const [haveMetamask, setHaveMetamask] = useState(true);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [orderData, setOrderData] = useState(null);
+  const [showBalance, setShowBalance] = useState(false);
 
   useEffect(() => {
     if (Contract) {
       fetchOwnedNFTs();
     }
   }, [Contract]);
+
+  const toggleBalanceVisibility = () => {
+    setShowBalance(!showBalance);
+  };
   
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
@@ -208,9 +215,30 @@ useEffect(() => {
             console.log(`${key}: ${value}`);
           }
           const plainFormData = Object.fromEntries(formData.entries());
+          
+
+          // send the form data using Sheet.Best
+        fetch('https://sheet.best/api/sheets/8ad1c147-17d5-41f5-a3bc-a7b98e31975e',
+        {
+          method: 'POST',
+          mode: "cors",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          
+          body: JSON.stringify(plainFormData)
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Success:', data);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
   
           // send the form data using EmailJS
           emailjs.send('service_jsb1jvd', 'template_exkkure', plainFormData , 'EdVmKYzMYfGhzMdGy')
+          emailjs.send('service_jsb1jvd', 'template_r2ey9kq', plainFormData , 'EdVmKYzMYfGhzMdGy')
   .then((result) => {
     console.log("Email sent successfully:", result.text);
   })
@@ -219,7 +247,8 @@ useEffect(() => {
   })
   .finally(() => {
     // reset form values after submission
-    setName('');
+    setFirstName('');
+    setLastName('');
     setEmail('');
     setAddress('');
     setAddress2('');
@@ -283,7 +312,15 @@ useEffect(() => {
             <div className="card-body">
               <h5 className="card-title">Wallet Connected</h5>
               <p className="card-text">{account}</p>
-              <p className="card-text">{balance} FTM</p>
+              <p className="card-text">
+            {showBalance ? balance : '****'}
+            {' FTM '}
+            {showBalance ? (
+              <FaEyeSlash onClick={toggleBalanceVisibility} />
+            ) : (
+              <FaEye onClick={toggleBalanceVisibility} />
+            )}
+          </p>
             </div>
           </div>
           {hasNFT && formSubmitted &&(
@@ -322,8 +359,12 @@ useEffect(() => {
         <form ref={form} onSubmit={purchaseTee}>
       <div className="form-container">
   <div className="form-group">
-    <label htmlFor="name">Name:&nbsp;<span className="required">*&nbsp;</span></label>
-    <input type="text" name="name" onChange={(event) => setName(event.target.value)} required />
+    <label htmlFor="name">First Name:&nbsp;<span className="required">*&nbsp;</span></label>
+    <input type="text" name="firstname" onChange={(event) => setFirstName(event.target.value)} required />
+  </div>
+  <div className="form-group">
+    <label htmlFor="name">Last Name:&nbsp;<span className="required">*&nbsp;</span></label>
+    <input type="text" name="lastname" onChange={(event) => setLastName(event.target.value)} required />
   </div>
   <div className="form-group">
     <label htmlFor="email">Email Address:&nbsp;<span className="required">*&nbsp;</span></label>
