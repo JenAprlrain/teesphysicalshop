@@ -1,5 +1,13 @@
+@font-face {
+  font-family: "Aller Bold Italic";
+  src: local("AllerBoldItalic"),
+   url("./fonts/Aller_BdIt.ttf") format("truetype");
+  font-weight: bold;
+  }
+
 body {
   background-color: #b3b1b1;
+  font-family: "Aller Bold Italic"
 }
 
 

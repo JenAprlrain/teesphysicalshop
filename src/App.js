@@ -7,6 +7,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import metamaskfox from './images/MetaMask_Fox.png';
+import ConkPunkTee from './images/ConkPunkTee.jpg'
 import emailjs from "emailjs-com";
 import { countryOptions } from './countries';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -35,6 +36,8 @@ function MyComponent() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [orderData, setOrderData] = useState(null);
   const [showBalance, setShowBalance] = useState(false);
+  const [price, setPrice] = useState("");
+  const [internationalPrice, setInternationalPrice] = useState("");
 
   useEffect(() => {
     if (Contract) {
@@ -145,10 +148,12 @@ useEffect(() => {
         console.log ('contract2:',Contract)
         const tokenURI = await Contract.methods.tokenURI(tokenId).call();
         console.log ('token URI:',tokenURI)
-        const response = await fetch(tokenURI);
+        const viewableURI = tokenURI.replace("ipfs://", "https://ipfs.io/ipfs/");
+        const response = await fetch(viewableURI);
         const tokenData = await response.json();
         console.log('tokenData:', tokenData);
-        ImageURLs.push(tokenData.image);
+        const viewableImageURI = tokenData.image.replace("ipfs://", "https://ipfs.io/ipfs/");
+        ImageURLs.push(viewableImageURI);
         Names.push(tokenData.name);
       }
       setImageURLs(ImageURLs);
@@ -167,6 +172,35 @@ useEffect(() => {
     slidesToScroll: 1
   };
 
+  let priceInEth = null;
+  let InternationalPriceInEth = null;
+
+  async function fetchPrice() {
+    try {
+      const web3 = new Web3(window.ethereum);
+      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
+      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
+  
+      const priceInWei = await teeshopContract.methods.getPrice().call();
+      const priceInEth = web3.utils.fromWei(priceInWei, 'ether');
+      setPrice(priceInEth);
+      console.log ('price:',priceInEth)
+
+      const InternationalpriceInWei = await teeshopContract.methods.getInternationalPrice().call();
+      const InternationalPriceInEth = web3.utils.fromWei(InternationalpriceInWei, 'ether');
+      setInternationalPrice(InternationalPriceInEth);
+      console.log ('International price:',InternationalPriceInEth)
+    } catch (error) {
+      // Handle any errors
+    }
+  }
+  
+  useEffect(() => {
+    fetchPrice();
+  }, []);
+  
+
+
   const purchaseTee = async (event) => {
     event.preventDefault(); // prevent the form from being submitted
 
@@ -182,6 +216,7 @@ useEffect(() => {
       const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
       const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
       const formData = new FormData(form.current);
+      const collection = "ConkPunks";
   
       const eventPromise = new Promise((resolve, reject) => {
         teeshopContract.events.NewOrder({ fromBlock: 'latest' }, (error, event) => {
@@ -210,6 +245,7 @@ useEffect(() => {
           formData.append('orderTime', orderTime);
           formData.append('fulfilled', fulfilled);
           formData.append('TransactionId', TransactionId)
+          formData.append('collection', collection)
 
           for (const [key, value] of formData.entries()) {
             console.log(`${key}: ${value}`);
@@ -288,13 +324,13 @@ useEffect(() => {
       console.error(error);
     }
   };
-  
-  
+
     const form = useRef(); // create a reference to the form element
     
   return (
     <div className="container">
-      <h1 className="title">Official NFTees Physical Shop</h1>
+      <h1 className="title">$Conk Punks TEES Physical Shop</h1>
+      <img src={ConkPunkTee} alt="Conk Punk Tee" style={{ display: "block", margin: "auto" }} />
       <div className="connect-wallet">
         <button className="connect-button" onClick={connectWallet}>
           Connect Wallet
@@ -343,6 +379,15 @@ useEffect(() => {
               </div>
             ))}
             </Slider>
+          </div>
+          <div className="wallet-info">
+          <div className="card">
+          <div className="card-body">
+          <p>United States Price: {price} FTM</p>
+          <p>International Price: {internationalPrice} FTM</p>
+          <p>Prices include shipping and handling</p>
+          </div>
+          </div>
           </div>
         </div>
       )}
