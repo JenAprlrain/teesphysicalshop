@@ -7,10 +7,13 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import metamaskfox from './images/MetaMask_Fox.png';
-import ConkPunkTee from './images/ConkPunkTee.jpg'
+import ConkPunkTee from './images/ConkPunkTee.png';
+import sizechart from './images/sizechart.png';
+import logo from './images/logo.png';
 import emailjs from "emailjs-com";
 import { countryOptions } from './countries';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+
 
 function MyComponent() {
   const [account, setAccount] = useState('');
@@ -38,6 +41,12 @@ function MyComponent() {
   const [showBalance, setShowBalance] = useState(false);
   const [price, setPrice] = useState("");
   const [internationalPrice, setInternationalPrice] = useState("");
+  const [walletAddress, setWalletAddress] = useState("");
+  const [orderIds, setOrderIds] = useState([]);
+  const [orderId, setOrderId] = useState("");
+  const [orderStatus, setOrderStatus] = useState(null);
+  const [fetchedOrderIds, setFetchedOrderIds] = useState(false);
+
 
   useEffect(() => {
     if (Contract) {
@@ -74,6 +83,12 @@ function MyComponent() {
         setContract(Contract);
 
         setIsConnected(true);
+        
+
+         // Scroll the screen to the center
+         setTimeout(() => {
+          window.scrollTo(0, 0.50 * window.innerHeight);
+        }, 500);
 
       } catch (error) {
         console.error(error);
@@ -85,6 +100,8 @@ function MyComponent() {
       setHaveMetamask(false);
     }
   };
+
+  
 
   async function fetchOwnedNFTs() {
     console.log("fetchOwnedNFTs function is called");
@@ -175,7 +192,7 @@ useEffect(() => {
   let priceInEth = null;
   let InternationalPriceInEth = null;
 
-  async function fetchPrice() {
+  async function fetchPrice(walletAddress) {
     try {
       const web3 = new Web3(window.ethereum);
       const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
@@ -185,21 +202,76 @@ useEffect(() => {
       const priceInEth = web3.utils.fromWei(priceInWei, 'ether');
       setPrice(priceInEth);
       console.log ('price:',priceInEth)
-
+  
       const InternationalpriceInWei = await teeshopContract.methods.getInternationalPrice().call();
       const InternationalPriceInEth = web3.utils.fromWei(InternationalpriceInWei, 'ether');
       setInternationalPrice(InternationalPriceInEth);
       console.log ('International price:',InternationalPriceInEth)
+  
     } catch (error) {
       // Handle any errors
     }
   }
   
+  
   useEffect(() => {
     fetchPrice();
   }, []);
   
+  const handleFetchOrderIds = async () => {
+    try {
+      const web3 = new Web3(window.ethereum);
+      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
+      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
 
+      const orderIds = await teeshopContract.methods.getOrdersByBuyer(walletAddress).call();
+      console.log('order IDs:', orderIds);
+      setOrderIds(orderIds);
+      setFetchedOrderIds(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleFetchOrderStatus = async () => {
+    try {
+      const web3 = new Web3(window.ethereum);
+      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
+      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
+      const order = await teeshopContract.methods.getOrder(orderId).call();
+      console.log('order status:', order);
+      setOrderStatus(order);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleResetWalletAddress = () => {
+    setWalletAddress("");
+    setOrderIds([]);
+    setFetchedOrderIds(false);
+  };
+
+  const handleResetOrderId = () => {
+    setOrderId("");
+    setOrderStatus(null);
+  };
+
+  const handleShowSizingChart = () => {
+    const lightbox = document.createElement("div");
+    lightbox.classList.add("lightbox");
+    const image = document.createElement("img");
+    image.src = sizechart;
+    lightbox.appendChild(image);
+    document.body.appendChild(lightbox);
+  };
+
+  document.body.addEventListener("click", (event) => {
+    if (event.target.classList.contains("lightbox")) {
+      event.target.remove();
+    }
+  });
+  
 
   const purchaseTee = async (event) => {
     event.preventDefault(); // prevent the form from being submitted
@@ -329,18 +401,58 @@ useEffect(() => {
     
   return (
     <div className="container">
-      <h1 className="title">$Conk Punks TEES Physical Shop</h1>
+      <img src={logo} alt="Conk Punk Tee" style={{ display: "block", margin: "auto" }} />
       <img src={ConkPunkTee} alt="Conk Punk Tee" style={{ display: "block", margin: "auto" }} />
+      <div className="ordercard">
+      <div className="ordercard-body">
+              <h5 className="ordercard-title">Check Order Status</h5>
+      <div>
+        <label>
+          Wallet Address:&nbsp;
+          <input type="text" value={walletAddress} onChange={(e) => setWalletAddress(e.target.value)} />
+        </label>
+        <button onClick={handleFetchOrderIds}>Fetch Order IDs</button>
+        <button onClick={handleResetWalletAddress}>Reset</button>
+        {fetchedOrderIds && orderIds.length === 0 && (
+  <div>
+    <p className="card-text">No orders have been received from this address.</p>
+  </div>
+)}
+
+{fetchedOrderIds && orderIds.length > 0 && (
+  <div>
+    <p className="card-text">Order IDs: {orderIds.join(", ")}</p>
+  </div>
+)}
+      </div>
+      <div>
+        <label>
+          Order ID:&nbsp;
+          <input type="text" value={orderId} onChange={(e) => setOrderId(e.target.value)} />
+        </label>
+        <button onClick={handleFetchOrderStatus}>Check Order Status</button>
+        <button onClick={handleResetOrderId}>Reset</button>
+        {orderStatus && (
+          <div>
+            <p className="card-text">Purchase was recieved for order ID {orderId}:</p>
+            <p className="card-text">Order time: {new Date(orderStatus.orderTime * 1000).toLocaleString()}</p>
+            <p className="card-text">Fulfilled: {orderStatus.fulfilled ? "Yes" : "No"}</p>
+          </div>
+        )}
+      </div>
+      </div>
+    </div>
       <div className="connect-wallet">
-        <button className="connect-button" onClick={connectWallet}>
-          Connect Wallet
-        </button>
-        </div>
+  <button className="connect-button" onClick={connectWallet}>
+    {isConnected ? 'WALLET CONNECTED' : 'CONNECT WALLET'}
+  </button>
+</div>
     {!haveMetamask && (
       <div className="no-metamask">
         <img src={metamaskfox} alt="Please install MetaMask" />
         <h2 className="no-metamask-text">Please install MetaMask to use this app.</h2>
       </div>
+      
     )}
       {isConnected && (
         <div className="wallet-info">
@@ -350,7 +462,7 @@ useEffect(() => {
               <p className="card-text">{account}</p>
               <p className="card-text">
             {showBalance ? balance : '****'}
-            {' FTM '}
+            {' FTM (Wallet Balance)'}
             {showBalance ? (
               <FaEyeSlash onClick={toggleBalanceVisibility} />
             ) : (
@@ -368,17 +480,9 @@ useEffect(() => {
       </div>
       )}
           {hasNFT && (
-        <div className="owned-nfts">
-          <h2 className="owned-nfts-text">Owned NFTs:</h2>
+        <div>
+          <h2 className="owned-nfts-text">Congrats, you're holding at least 1 conk punk in your wallet, you can purchase a conk punk physical tee!</h2>
           <div className="nft-list">
-          <Slider className="my-slider" {...settings}>
-            {OwnedNFTs.map((tokenId, index) => (
-              <div className="nft-card" key={tokenId}>
-                <img src={ImageURLs[index]} alt={Names[index]} />
-                <p>{Names[index]}</p>
-              </div>
-            ))}
-            </Slider>
           </div>
           <div className="wallet-info">
           <div className="card">
@@ -397,6 +501,11 @@ useEffect(() => {
           <a href="https://nftkey.app/collections/conkpunks/" target="_blank" rel="noreferrer">https://nftkey.app/collections/conkpunks/</a>
         </div>
       )}
+      <br></br>
+      <br></br>
+      <button className="purchase-button" id="View sizing-chart" onClick={handleShowSizingChart}>View Sizing Chart</button>
+      <br></br>
+      <br></br>
       <br></br>
       <br></br>
       {hasNFT && !hasPurchasedTee && (
@@ -453,14 +562,16 @@ useEffect(() => {
       <option value="S">Small</option>
       <option value="M">Medium</option>
       <option value="L">Large</option>
-      <option value="XL">Extra Large</option>
+      <option value="XL">XL</option>
+      <option value="XXL">XXL</option>
+      <option value="XXXL">XXXL</option>
     </select>
   </div>
 </div>
  <br></br>
   <br></br>
           <button className="purchase-button" type="submit">
-            Purchase TEE
+            PURCHASE TEE
           </button>
           </form>
         </div>
