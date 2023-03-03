@@ -9,14 +9,27 @@ body {
   background-color: #7A7B7E;
   background-image: url('./images/background.png');
   background-repeat: no-repeat;
+  background-attachment: fixed;
   font-family: "Aller Bold Italic"
 }
 
+@media only screen and (max-width: 768px) {
+  body {
+    background-size: contain;
+    background-position: top center;
+  }
+}
 
 .container {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+}
+
+@media (max-width: 767px) {
+  .container img {
+    padding-top: 70px;
+  }
 }
 
 .title {
@@ -28,10 +41,11 @@ button {
   border: 1px solid black;
   border-radius: 5px;
   color: black;
-  cursor: pointer;
+  box-shadow: 3px 3px 3px #353333;
   font-size: 12px;
   padding: 4px;
   margin-left: 5px;
+  font-family: "Aller Bold Italic";
 }
 
 button:hover {
@@ -42,7 +56,9 @@ button:hover {
 .connect-wallet {
   text-align: center;
   margin-top: 50px;
+  width: 100%;
 }
+
 
 .connect-button {
   background-color: #D93540;
@@ -57,6 +73,18 @@ button:hover {
   top: 60px;
   right: 200px;
 }
+
+@media only screen and (max-width: 768px) {
+  .connect-button {
+    font-size: 4vw;
+    padding: 2vh 4vw;
+    border-radius: 8vw;
+    position: absolute;
+    top: 10px;
+    right: 5px;
+  }
+}
+
 
 .connect-button:hover {
   cursor: pointer;
@@ -241,12 +269,37 @@ select {
   width: 300px;
 }
 
+@media (max-width: 767px) {
+  .form-group label,
+  .form-group input {
+    font-size: 1em;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  .form-group select {
+    margin-left: 4px;
+  }
+
+  .form-container {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+
+  select {
+    width: 100%;
+  }
+}
+
+
 .no-metamask {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
+  height: 20vh;
 }
 
 .no-metamask-image {
@@ -262,6 +315,11 @@ select {
   background-color: red;
   color: white;
   padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid black;
+  box-shadow: 5px 5px 5px #353333;
+  font-family: "Aller Bold Italic";
+  text-align: center;
 }
 
 .lightbox {
@@ -280,4 +338,51 @@ select {
 .lightbox img {
   max-width: 90%;
   max-height: 90%;
+}
+
+
+@media (max-width: 767px) {
+  .lightbox img {
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 70%;
+    max-height: 70%;
+  }
+}
+
+
+.reroute-button {
+  background-color: white;
+  color: black;
+  border: none;
+  font-size: 14px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 5px #353333;
+  font-family: "Aller Bold Italic";
+  margin-right: 40px;
+}
+
+@media only screen and (max-width: 600px) {
+  .reroute-button {
+    font-size: 12px;
+    padding: 10px;
+    margin-right: 5px;
+  }
+}
+
+
+.container img {
+  display: block;
+  margin: auto;
+}
+
+@media (max-width: 767px) {
+  .container img {
+    width: 80%;
+    margin-top: 100px;
+  }
 }

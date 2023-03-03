@@ -398,50 +398,20 @@ useEffect(() => {
   };
 
     const form = useRef(); // create a reference to the form element
+
+    function handleReset() {
+      window.location.reload();
+    }
+
+      function handleWebsiteClick() {
+        window.location.href = 'https://www.officialnftees.com';
+      }
     
   return (
     <div className="container">
       <img src={logo} alt="Conk Punk Tee" style={{ display: "block", margin: "auto" }} />
       <img src={ConkPunkTee} alt="Conk Punk Tee" style={{ display: "block", margin: "auto" }} />
-      <div className="ordercard">
-      <div className="ordercard-body">
-              <h5 className="ordercard-title">Check Order Status</h5>
-      <div>
-        <label>
-          Wallet Address:&nbsp;
-          <input type="text" value={walletAddress} onChange={(e) => setWalletAddress(e.target.value)} />
-        </label>
-        <button onClick={handleFetchOrderIds}>Fetch Order IDs</button>
-        <button onClick={handleResetWalletAddress}>Reset</button>
-        {fetchedOrderIds && orderIds.length === 0 && (
-  <div>
-    <p className="card-text">No orders have been received from this address.</p>
-  </div>
-)}
 
-{fetchedOrderIds && orderIds.length > 0 && (
-  <div>
-    <p className="card-text">Order IDs: {orderIds.join(", ")}</p>
-  </div>
-)}
-      </div>
-      <div>
-        <label>
-          Order ID:&nbsp;
-          <input type="text" value={orderId} onChange={(e) => setOrderId(e.target.value)} />
-        </label>
-        <button onClick={handleFetchOrderStatus}>Check Order Status</button>
-        <button onClick={handleResetOrderId}>Reset</button>
-        {orderStatus && (
-          <div>
-            <p className="card-text">Purchase was recieved for order ID {orderId}:</p>
-            <p className="card-text">Order time: {new Date(orderStatus.orderTime * 1000).toLocaleString()}</p>
-            <p className="card-text">Fulfilled: {orderStatus.fulfilled ? "Yes" : "No"}</p>
-          </div>
-        )}
-      </div>
-      </div>
-    </div>
       <div className="connect-wallet">
   <button className="connect-button" onClick={connectWallet}>
     {isConnected ? 'WALLET CONNECTED' : 'CONNECT WALLET'}
@@ -459,7 +429,7 @@ useEffect(() => {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title">Wallet Connected</h5>
-              <p className="card-text">{account}</p>
+              <p className="card-text">{account.substr(0, 6)}...{account.substr(-4)}</p>
               <p className="card-text">
             {showBalance ? balance : '****'}
             {' FTM (Wallet Balance)'}
@@ -476,10 +446,13 @@ useEffect(() => {
         <div className="overlay"></div>
         <div className="popup">
           <p>You have successfully purchased a TEE!</p>
+          <p>You will be recieving an email with your order details</p>
+          <button className="reroute-button" onClick={handleReset}>ORDER ANOTHER TEE</button>
+          <button className="reroute-button" onClick={handleWebsiteClick}>VISIT OUR WEBSITE</button>
         </div>
       </div>
       )}
-          {hasNFT && (
+          {hasNFT && !hasPurchasedTee && (
         <div>
           <h2 className="owned-nfts-text">Congrats, you're holding at least 1 conk punk in your wallet, you can purchase a conk punk physical tee!</h2>
           <div className="nft-list">
@@ -503,13 +476,13 @@ useEffect(() => {
       )}
       <br></br>
       <br></br>
-      <button className="purchase-button" id="View sizing-chart" onClick={handleShowSizingChart}>View Sizing Chart</button>
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
       {hasNFT && !hasPurchasedTee && (
         <div className="purchase-tee">
+           <button className="purchase-button" id="View sizing-chart" onClick={handleShowSizingChart}>View Sizing Chart</button>
+           <br></br>
+           <br></br>
+           <br></br>
+           <br></br>
         <form ref={form} onSubmit={purchaseTee}>
       <div className="form-container">
   <div className="form-group">
@@ -576,6 +549,49 @@ useEffect(() => {
           </form>
         </div>
       )}
+    </div>
+  )}
+  <br></br>
+  <br></br>
+  {haveMetamask && (
+  <div className="ordercard">
+      <div className="ordercard-body">
+              <h5 className="ordercard-title">Check Order Status</h5>
+      <div>
+        <label>
+          Wallet Address:&nbsp;
+          <input type="text" value={walletAddress} onChange={(e) => setWalletAddress(e.target.value)} />
+        </label>
+        <button onClick={handleFetchOrderIds}>Fetch Order IDs</button>
+        <button onClick={handleResetWalletAddress}>Reset</button>
+        {fetchedOrderIds && orderIds.length === 0 && (
+  <div>
+    <p className="card-text">No orders have been received from this address.</p>
+  </div>
+)}
+
+{fetchedOrderIds && orderIds.length > 0 && (
+  <div>
+    <p className="card-text">Order IDs: {orderIds.join(", ")}</p>
+  </div>
+)}
+      </div>
+      <div>
+        <label>
+          Order ID:&nbsp;
+          <input type="text" value={orderId} onChange={(e) => setOrderId(e.target.value)} />
+        </label>
+        <button onClick={handleFetchOrderStatus}>Check Order Status</button>
+        <button onClick={handleResetOrderId}>Reset</button>
+        {orderStatus && (
+          <div>
+            <p className="card-text">Purchase was recieved for order ID {orderId}:</p>
+            <p className="card-text">Order time: {new Date(orderStatus.orderTime * 1000).toLocaleString()}</p>
+            <p className="card-text">Fulfilled: {orderStatus.fulfilled ? "Yes" : "No"}</p>
+          </div>
+        )}
+      </div>
+      </div>
     </div>
   )}
 </div>
