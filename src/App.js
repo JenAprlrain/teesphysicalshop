@@ -46,6 +46,7 @@ function MyComponent() {
   const [orderId, setOrderId] = useState("");
   const [orderStatus, setOrderStatus] = useState(null);
   const [fetchedOrderIds, setFetchedOrderIds] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
 
   useEffect(() => {
@@ -275,7 +276,7 @@ useEffect(() => {
 
   const purchaseTee = async (event) => {
     event.preventDefault(); // prevent the form from being submitted
-
+    setIsSubmitting(true);
     let TransactionId = null;
 
     try {
@@ -367,6 +368,7 @@ useEffect(() => {
     setShirtSize('');
     setFormSubmitted(true);
     setHasPurchasedTee(true);
+    setIsSubmitting(true);
     if (form.current) {
       form.current.reset();
       console.log('Form data after reset:', new FormData(form.current));
@@ -429,7 +431,7 @@ useEffect(() => {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title">Wallet Connected</h5>
-              <p className="card-text">{account.substr(0, 6)}...{account.substr(-4)}</p>
+              <p className="card-text">{account}</p>
               <p className="card-text">
             {showBalance ? balance : '****'}
             {' FTM (Wallet Balance)'}
@@ -543,9 +545,9 @@ useEffect(() => {
 </div>
  <br></br>
   <br></br>
-          <button className="purchase-button" type="submit">
-            PURCHASE TEE
-          </button>
+  <button className="purchase-button" type="submit" disabled={isSubmitting}>
+  PURCHASE TEE
+</button>
           </form>
         </div>
       )}
