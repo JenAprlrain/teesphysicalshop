@@ -47,7 +47,6 @@ function MyComponent() {
   const [orderStatus, setOrderStatus] = useState(null);
   const [fetchedOrderIds, setFetchedOrderIds] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   useEffect(() => {
     if (Contract) {
@@ -181,14 +180,9 @@ useEffect(() => {
       // Handle any errors
     }
   }
-
-  const settings = {
-    dots: true,
-    infinite: false,
-    speed: 500,
-    slidesToShow: 4,
-    slidesToScroll: 1
-  };
+  const web3 = new Web3(window.ethereum);
+  const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
+  const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
 
   let priceInEth = null;
   let InternationalPriceInEth = null;
@@ -196,8 +190,6 @@ useEffect(() => {
   async function fetchPrice(walletAddress) {
     try {
       const web3 = new Web3(window.ethereum);
-      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
-      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
   
       const priceInWei = await teeshopContract.methods.getPrice().call();
       const priceInEth = web3.utils.fromWei(priceInWei, 'ether');
@@ -221,9 +213,6 @@ useEffect(() => {
   
   const handleFetchOrderIds = async () => {
     try {
-      const web3 = new Web3(window.ethereum);
-      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
-      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
 
       const orderIds = await teeshopContract.methods.getOrdersByBuyer(walletAddress).call();
       console.log('order IDs:', orderIds);
@@ -236,9 +225,6 @@ useEffect(() => {
 
   const handleFetchOrderStatus = async () => {
     try {
-      const web3 = new Web3(window.ethereum);
-      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
-      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
       const order = await teeshopContract.methods.getOrder(orderId).call();
       console.log('order status:', order);
       setOrderStatus(order);
@@ -279,20 +265,12 @@ useEffect(() => {
     setIsSubmitting(true);
     let TransactionId = null;
 
-    if (isFormSubmitted) {
-      return;
-    }
-    setIsSubmitting(true);  
-
     try {
-      const web3 = new Web3(window.ethereum);
   
       // Get the user's account address
       const accounts = await web3.eth.getAccounts();
       const walletaddress = accounts[0];
   
-      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
-      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
       const formData = new FormData(form.current);
       const collection = "ConkPunks";
   
@@ -371,7 +349,6 @@ useEffect(() => {
     setZipcode('');
     setCountry('');
     setShirtSize('');
-    setFormSubmitted(true);
     setHasPurchasedTee(true);
     setIsSubmitting(true);
     if (form.current) {
@@ -400,20 +377,10 @@ useEffect(() => {
       setHasPurchasedTee(true);
   
     } catch (error) {
-      if (error.code === 4001) { // User rejected the transaction
-        setIsSubmitting(false);
-      } else {
-        console.error(error);
-      }
-    } finally {
-      setIsFormSubmitted(true);
-      setIsSubmitting(false);
-
-      if (form.current) {
-        form.current.reset();
-        console.log('Form data after reset:', new FormData(form.current));
-      }
+      console.error(error);
+      window.location.reload();
     }
+
   };
 
     const form = useRef(); // create a reference to the form element
@@ -460,7 +427,7 @@ useEffect(() => {
           </p>
             </div>
           </div>
-          {hasNFT && formSubmitted &&(
+          {hasNFT && hasPurchasedTee &&(
         <div className="popup-wrapper">
         <div className="overlay"></div>
         <div className="popup">
@@ -606,7 +573,7 @@ useEffect(() => {
           <div>
             <p className="card-text">Purchase was recieved for order ID {orderId}:</p>
             <p className="card-text">Order time: {new Date(orderStatus.orderTime * 1000).toLocaleString()}</p>
-            <p className="card-text">Fulfilled: {orderStatus.fulfilled ? "Yes" : "No"}</p>
+            <p className="card-text">Fulfilled: {orderStatus.fulfilled ? "Yes, Check email for tracking number" : "No, still processing order"}</p>
           </div>
         )}
       </div>

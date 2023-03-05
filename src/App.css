@@ -149,6 +149,18 @@ button:hover {
   margin-bottom: 10px;
 }
 
+.infocard-text {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 767px) {
+  .infocard-text {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+}
+
 .purchase-tee {
   text-align: center;
 }
