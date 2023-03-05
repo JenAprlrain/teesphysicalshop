@@ -275,7 +275,7 @@ useEffect(() => {
       const collection = "ConkPunks";
   
       const eventPromise = new Promise((resolve, reject) => {
-        teeshopContract.events.NewOrder({ filter: { orderId: orderId, buyer: walletaddress }, fromBlock: 'latest' }, (error, event) => {
+        teeshopContract.events.NewOrder({ filter: { buyer: walletaddress }, fromBlock: 'latest' }, (error, event) => {
           if (error) {
             reject(error);
           }
