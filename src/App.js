@@ -266,6 +266,7 @@ useEffect(() => {
     let TransactionId = null;
 
     try {
+      const web3 = new Web3(window.ethereum);
   
       // Get the user's account address
       const accounts = await web3.eth.getAccounts();
@@ -446,9 +447,9 @@ useEffect(() => {
           <div className="wallet-info">
           <div className="card">
           <div className="card-body">
-          <p className="infocard-text">United States Price: {price} FTM</p>
-          <p className="infocard-text">International Price: {internationalPrice} FTM</p>
-          <p className="infocard-text">Prices include shipping and handling</p>
+          <p>United States Price: {price} FTM</p>
+          <p>International Price: {internationalPrice} FTM</p>
+          <p>Prices include shipping and handling</p>
           </div>
           </div>
           </div>
