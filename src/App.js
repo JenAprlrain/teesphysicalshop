@@ -393,7 +393,6 @@ useEffect(() => {
       } else {
         result = await teeshopContract.methods.buyTeeI().send({ from: walletaddress, value: web3.utils.toWei("2", "ether") });
       }
-      await result.wait(); // Wait for the transaction to be confirmed
       TransactionId = result.transactionHash;
       console.log('Transaction Hash:', TransactionId);
       
