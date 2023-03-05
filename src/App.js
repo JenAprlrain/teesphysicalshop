@@ -47,7 +47,7 @@ function MyComponent() {
   const [orderStatus, setOrderStatus] = useState(null);
   const [fetchedOrderIds, setFetchedOrderIds] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
   useEffect(() => {
     if (Contract) {
@@ -279,6 +279,11 @@ useEffect(() => {
     setIsSubmitting(true);
     let TransactionId = null;
 
+    if (isFormSubmitted) {
+      return;
+    }
+    setIsSubmitting(true);  
+
     try {
       const web3 = new Web3(window.ethereum);
   
@@ -388,6 +393,7 @@ useEffect(() => {
       } else {
         result = await teeshopContract.methods.buyTeeI().send({ from: walletaddress, value: web3.utils.toWei("2", "ether") });
       }
+      await result.wait(); // Wait for the transaction to be confirmed
       TransactionId = result.transactionHash;
       console.log('Transaction Hash:', TransactionId);
       
@@ -395,7 +401,19 @@ useEffect(() => {
       setHasPurchasedTee(true);
   
     } catch (error) {
-      console.error(error);
+      if (error.code === 4001) { // User rejected the transaction
+        setIsSubmitting(false);
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setIsFormSubmitted(true);
+      setIsSubmitting(false);
+
+      if (form.current) {
+        form.current.reset();
+        console.log('Form data after reset:', new FormData(form.current));
+      }
     }
   };
 
@@ -431,7 +449,7 @@ useEffect(() => {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title">Wallet Connected</h5>
-              <p className="card-text">{account}</p>
+              <p className="card-text">{account.substr(0, 6)}...{account.substr(-4)}</p>
               <p className="card-text">
             {showBalance ? balance : '****'}
             {' FTM (Wallet Balance)'}
