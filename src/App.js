@@ -262,7 +262,6 @@ useEffect(() => {
 
   const purchaseTee = async (event) => {
     event.preventDefault(); // prevent the form from being submitted
-    setIsSubmitting(true);
     let TransactionId = null;
 
     try {
@@ -447,9 +446,9 @@ useEffect(() => {
           <div className="wallet-info">
           <div className="card">
           <div className="card-body">
-          <p>United States Price: {price} FTM</p>
-          <p>International Price: {internationalPrice} FTM</p>
-          <p>Prices include shipping and handling</p>
+          <p className="infocard-text">United States Price: {price} FTM</p>
+          <p className="infocard-text">International Price: {internationalPrice} FTM</p>
+          <p className="infocard-text">Prices include shipping and handling</p>
           </div>
           </div>
           </div>
@@ -497,7 +496,7 @@ useEffect(() => {
     <input type="text" name="city" onChange={(event) => setCity(event.target.value)} required />
   </div>
   <div className="form-group">
-    <label htmlFor="state/region">State/Region:&nbsp;<span className="required">*&nbsp;</span></label>
+    <label htmlFor="state / region">State/Region:&nbsp;<span className="required">*&nbsp;</span></label>
     <input type="text" name="state" onChange={(event) => setState(event.target.value)} required />
   </div>
   <div className="form-group">
