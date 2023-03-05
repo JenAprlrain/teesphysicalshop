@@ -275,7 +275,7 @@ useEffect(() => {
       const collection = "ConkPunks";
   
       const eventPromise = new Promise((resolve, reject) => {
-        teeshopContract.events.NewOrder({ fromBlock: 'latest' }, (error, event) => {
+      teeshopContract.events.NewOrder({ filter: { orderId: orderId }, fromBlock: 'latest' }, (error, event) => {
           if (error) {
             reject(error);
           }
@@ -446,9 +446,9 @@ useEffect(() => {
           <div className="wallet-info">
           <div className="card">
           <div className="card-body">
-          <p>United States Price: {price} FTM</p>
-          <p>International Price: {internationalPrice} FTM</p>
-          <p>Prices include shipping and handling</p>
+          <p className="infocard-text">United States Price: {price} FTM</p>
+          <p className="infocard-text">International Price: {internationalPrice} FTM</p>
+          <p className="infocard-text">Prices include shipping and handling</p>
           </div>
           </div>
           </div>
