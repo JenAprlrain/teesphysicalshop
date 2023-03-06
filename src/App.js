@@ -46,7 +46,9 @@ function MyComponent() {
   const [orderId, setOrderId] = useState("");
   const [orderStatus, setOrderStatus] = useState(null);
   const [fetchedOrderIds, setFetchedOrderIds] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderStatusNotFound, setOrderStatusNotFound] = useState(false);
+
+
 
   useEffect(() => {
     if (Contract) {
@@ -180,6 +182,7 @@ useEffect(() => {
       // Handle any errors
     }
   }
+
   const web3 = new Web3(window.ethereum);
   const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
   const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
@@ -190,6 +193,8 @@ useEffect(() => {
   async function fetchPrice(walletAddress) {
     try {
       const web3 = new Web3(window.ethereum);
+      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
+      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
   
       const priceInWei = await teeshopContract.methods.getPrice().call();
       const priceInEth = web3.utils.fromWei(priceInWei, 'ether');
@@ -213,6 +218,9 @@ useEffect(() => {
   
   const handleFetchOrderIds = async () => {
     try {
+      const web3 = new Web3(window.ethereum);
+      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
+      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
 
       const orderIds = await teeshopContract.methods.getOrdersByBuyer(walletAddress).call();
       console.log('order IDs:', orderIds);
@@ -226,12 +234,18 @@ useEffect(() => {
   const handleFetchOrderStatus = async () => {
     try {
       const order = await teeshopContract.methods.getOrder(orderId).call();
-      console.log('order status:', order);
-      setOrderStatus(order);
+      if (order.orderTime === '0') {
+        setOrderStatusNotFound(true);
+      } else {
+        setOrderStatus(order);
+      }
+      setOrderData(order);
     } catch (error) {
       console.error(error);
+      setOrderStatusNotFound(true);
     }
   };
+  
 
   const handleResetWalletAddress = () => {
     setWalletAddress("");
@@ -262,6 +276,7 @@ useEffect(() => {
 
   const purchaseTee = async (event) => {
     event.preventDefault(); // prevent the form from being submitted
+
     let TransactionId = null;
 
     try {
@@ -271,17 +286,18 @@ useEffect(() => {
       const accounts = await web3.eth.getAccounts();
       const walletaddress = accounts[0];
   
+      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
+      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
       const formData = new FormData(form.current);
       const collection = "ConkPunks";
   
       const eventPromise = new Promise((resolve, reject) => {
-        teeshopContract.events.NewOrder({ fromBlock: 'latest' }, (error, event) => {
+        teeshopContract.events.NewOrder({ filter: { buyer: walletaddress }, fromBlock: 'latest' }, (error, event) => {
           if (error) {
             reject(error);
           }
           const { orderId, buyer, fulfilled, } = event.returnValues;
           const orderTime = new Date(event.returnValues.orderTime * 1000).toLocaleString('en-US', {
-            timeZone: 'America/New_York',
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -293,7 +309,7 @@ useEffect(() => {
           });
           console.log('NewOrder event data:', { orderId, buyer, orderTime, fulfilled });
           setOrderData({ orderId, buyer, orderTime, fulfilled });
-  
+          
           // add the event data to the form data
           const formData = new FormData(form.current);
           formData.append('orderId', orderId);
@@ -349,14 +365,13 @@ useEffect(() => {
     setZipcode('');
     setCountry('');
     setShirtSize('');
+    setFormSubmitted(true);
     setHasPurchasedTee(true);
-    setIsSubmitting(true);
     if (form.current) {
       form.current.reset();
       console.log('Form data after reset:', new FormData(form.current));
     }
   });
-  
           resolve();
         });
       });
@@ -380,9 +395,7 @@ useEffect(() => {
       console.error(error);
       window.location.reload();
     }
-
-  };
-
+  }
     const form = useRef(); // create a reference to the form element
 
     function handleReset() {
@@ -427,7 +440,7 @@ useEffect(() => {
           </p>
             </div>
           </div>
-          {hasNFT && hasPurchasedTee &&(
+          {hasNFT && formSubmitted &&(
         <div className="popup-wrapper">
         <div className="overlay"></div>
         <div className="popup">
@@ -496,7 +509,7 @@ useEffect(() => {
     <input type="text" name="city" onChange={(event) => setCity(event.target.value)} required />
   </div>
   <div className="form-group">
-    <label htmlFor="state / region">State/Region:&nbsp;<span className="required">*&nbsp;</span></label>
+    <label htmlFor="state/region">State/Region:&nbsp;<span className="required">*&nbsp;</span></label>
     <input type="text" name="state" onChange={(event) => setState(event.target.value)} required />
   </div>
   <div className="form-group">
@@ -529,9 +542,9 @@ useEffect(() => {
 </div>
  <br></br>
   <br></br>
-  <button className="purchase-button" type="submit" disabled={isSubmitting}>
-  PURCHASE TEE
-</button>
+          <button className="purchase-button" type="submit">
+            PURCHASE TEE
+          </button>
           </form>
         </div>
       )}
@@ -561,21 +574,35 @@ useEffect(() => {
     <p className="card-text">Order IDs: {orderIds.join(", ")}</p>
   </div>
 )}
-      </div>
-      <div>
-        <label>
-          Order ID:&nbsp;
-          <input type="text" value={orderId} onChange={(e) => setOrderId(e.target.value)} />
-        </label>
-        <button onClick={handleFetchOrderStatus}>Check Order Status</button>
-        <button onClick={handleResetOrderId}>Reset</button>
-        {orderStatus && (
-          <div>
-            <p className="card-text">Purchase was recieved for order ID {orderId}:</p>
-            <p className="card-text">Order time: {new Date(orderStatus.orderTime * 1000).toLocaleString()}</p>
-            <p className="card-text">Fulfilled: {orderStatus.fulfilled ? "Yes, Check email for tracking number" : "No, still processing order"}</p>
-          </div>
-        )}
+{fetchedOrderIds && orderIds.length === 0 && orderId !== '' && (
+  <div>
+    <p className="card-text">No orders have been found with the order ID {orderId}.</p>
+  </div>
+)}
+<div>
+  <label>
+    Order ID:&nbsp;
+    <input type="text" value={orderId} onChange={(e) => setOrderId(e.target.value)} />
+  </label>
+  <button onClick={handleFetchOrderStatus}>Check Order Status</button>
+  <button onClick={handleResetOrderId}>Reset</button>
+  {orderStatus && (
+    <div>
+      <p className="card-text">Purchase was received for order ID {orderId}:</p>
+      <p className="card-text">Order time: {new Date(orderStatus.orderTime * 1000).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: true,
+        timeZoneName: 'short'
+      })}</p>
+      <p className="card-text">Fulfilled: {orderStatus.fulfilled ? "Yes, Check email for tracking number" : "No, still processing order"}</p>
+    </div>
+  )}
+</div>
       </div>
       </div>
     </div>
