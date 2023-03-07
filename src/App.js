@@ -192,10 +192,6 @@ useEffect(() => {
 
   async function fetchPrice(walletAddress) {
     try {
-      const web3 = new Web3(window.ethereum);
-      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
-      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
-  
       const priceInWei = await teeshopContract.methods.getPrice().call();
       const priceInEth = web3.utils.fromWei(priceInWei, 'ether');
       setPrice(priceInEth);
@@ -218,26 +214,28 @@ useEffect(() => {
   
   const handleFetchOrderIds = async () => {
     try {
-      const web3 = new Web3(window.ethereum);
-      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
-      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
-
       const orderIds = await teeshopContract.methods.getOrdersByBuyer(walletAddress).call();
       console.log('order IDs:', orderIds);
       setOrderIds(orderIds);
       setFetchedOrderIds(true);
+  
+      orderIds.forEach(async (orderId) => {
+        await handleFetchOrderStatus(orderId);
+      });
     } catch (error) {
       console.error(error);
     }
   };
+  
 
   const handleFetchOrderStatus = async () => {
     try {
       const order = await teeshopContract.methods.getOrder(orderId).call();
-      if (order.orderTime === '0') {
+      if (parseInt(order.orderTime) === 0) {
         setOrderStatusNotFound(true);
       } else {
         setOrderStatus(order);
+        setOrderStatusNotFound(false);
       }
       setOrderData(order);
     } catch (error) {
@@ -246,7 +244,8 @@ useEffect(() => {
     }
   };
   
-
+  
+  
   const handleResetWalletAddress = () => {
     setWalletAddress("");
     setOrderIds([]);
@@ -256,6 +255,7 @@ useEffect(() => {
   const handleResetOrderId = () => {
     setOrderId("");
     setOrderStatus(null);
+    setOrderStatusNotFound(false);
   };
 
   const handleShowSizingChart = () => {
@@ -286,15 +286,17 @@ useEffect(() => {
       const accounts = await web3.eth.getAccounts();
       const walletaddress = accounts[0];
   
-      const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
-      const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
       const formData = new FormData(form.current);
       const collection = "ConkPunks";
   
       const eventPromise = new Promise((resolve, reject) => {
-        teeshopContract.events.NewOrder({ filter: { buyer: walletaddress }, fromBlock: 'latest' }, (error, event) => {
+        teeshopContract.events.NewOrder({ fromBlock: 'latest' }, (error, event) => {
           if (error) {
             reject(error);
+          }
+          if (event.returnValues.buyer.toLowerCase() === walletaddress.toLowerCase()) {
+            // Resolve the promise if the buyer field matches the msg.sender parameter
+            resolve(event);
           }
           const { orderId, buyer, fulfilled, } = event.returnValues;
           const orderTime = new Date(event.returnValues.orderTime * 1000).toLocaleString('en-US', {
@@ -574,11 +576,6 @@ useEffect(() => {
     <p className="card-text">Order IDs: {orderIds.join(", ")}</p>
   </div>
 )}
-{fetchedOrderIds && orderIds.length === 0 && orderId !== '' && (
-  <div>
-    <p className="card-text">No orders have been found with the order ID {orderId}.</p>
-  </div>
-)}
 <div>
   <label>
     Order ID:&nbsp;
@@ -586,6 +583,12 @@ useEffect(() => {
   </label>
   <button onClick={handleFetchOrderStatus}>Check Order Status</button>
   <button onClick={handleResetOrderId}>Reset</button>
+  </div>
+  {orderStatusNotFound && (
+  <div>
+    <p className="card-text">No orders have been found with the order ID.</p>
+  </div>
+)}
   {orderStatus && (
     <div>
       <p className="card-text">Purchase was received for order ID {orderId}:</p>
@@ -605,7 +608,6 @@ useEffect(() => {
 </div>
       </div>
       </div>
-    </div>
   )}
 </div>
 );
