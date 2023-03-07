@@ -3,7 +3,7 @@
       "inputs":[
          {
             "internalType":"uint256",
-            "name":"_totalTees",
+            "name":"_maxTees",
             "type":"uint256"
          },
          {
@@ -69,6 +69,21 @@
       ],
       "name":"OwnershipTransferred",
       "type":"event"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"admin",
+      "outputs":[
+         {
+            "internalType":"address",
+            "name":"",
+            "type":"address"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
    },
    {
       "inputs":[
@@ -201,7 +216,22 @@
       "inputs":[
          
       ],
-      "name":"getTotalTees",
+      "name":"getboughtTees",
+      "outputs":[
+         {
+            "internalType":"uint256",
+            "name":"",
+            "type":"uint256"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"getmaxtees",
       "outputs":[
          {
             "internalType":"uint256",
@@ -236,6 +266,21 @@
          }
       ],
       "name":"markFulfilled",
+      "outputs":[
+         
+      ],
+      "stateMutability":"nonpayable",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         {
+            "internalType":"uint256[]",
+            "name":"_orderIds",
+            "type":"uint256[]"
+         }
+      ],
+      "name":"markFulfilledBatch",
       "outputs":[
          
       ],
@@ -282,6 +327,21 @@
    {
       "inputs":[
          {
+            "internalType":"address",
+            "name":"adminAddress",
+            "type":"address"
+         }
+      ],
+      "name":"setAdmin",
+      "outputs":[
+         
+      ],
+      "stateMutability":"nonpayable",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         {
             "internalType":"uint256",
             "name":"_price",
             "type":"uint256"
@@ -313,11 +373,11 @@
       "inputs":[
          {
             "internalType":"uint256",
-            "name":"_totalTees",
+            "name":"_maxTees",
             "type":"uint256"
          }
       ],
-      "name":"setTotalTees",
+      "name":"setmaxTees",
       "outputs":[
          
       ],

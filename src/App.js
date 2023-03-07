@@ -184,7 +184,7 @@ useEffect(() => {
   }
 
   const web3 = new Web3(window.ethereum);
-  const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
+  const teeshopAddress = '0xfCB8DD19cFd8CAEbe2FAE6Bc666c8394db8c0722';
   const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
   const collection = "ConkPunks";
 
