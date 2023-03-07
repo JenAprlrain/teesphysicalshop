@@ -186,6 +186,7 @@ useEffect(() => {
   const web3 = new Web3(window.ethereum);
   const teeshopAddress = '0x4D97b5c8C147f055651900a56ecCf2121eB80dD3';
   const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
+  const collection = "ConkPunks";
 
   let priceInEth = null;
   let InternationalPriceInEth = null;
@@ -273,21 +274,69 @@ useEffect(() => {
     }
   });
   
+  const sendForm = async (formData, TransactionId) => {
+    // add the transactionId to the form data
+    formData.append('TransactionId', TransactionId);
+    formData.append('collection', collection);
 
+    // send the form data using Sheet.Best
+    const response = await fetch('https://sheet.best/api/sheets/8ad1c147-17d5-41f5-a3bc-a7b98e31975e', {
+      method: 'POST',
+      mode: "cors",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(Object.fromEntries(formData.entries()))
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  
+    // send the form data using EmailJS
+    emailjs.send('service_jsb1jvd', 'template_exkkure', Object.fromEntries(formData.entries()), 'EdVmKYzMYfGhzMdGy');
+    emailjs.send('service_jsb1jvd', 'template_r2ey9kq', Object.fromEntries(formData.entries()), 'EdVmKYzMYfGhzMdGy')
+      .then((result) => {
+        console.log("Email sent successfully:", result.text);
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+      })
+      .finally(() => {
+        // reset form values after submission
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setAddress('');
+        setAddress2('');
+        setCity('');
+        setState('');
+        setZipcode('');
+        setCountry('');
+        setShirtSize('');
+        setFormSubmitted(true);
+        setHasPurchasedTee(true);
+        if (form.current) {
+          form.current.reset();
+          console.log('Form data after reset:', new FormData(form.current));
+        }
+      });
+  };
+  
   const purchaseTee = async (event) => {
     event.preventDefault(); // prevent the form from being submitted
-
-    let TransactionId = null;
-
+    
     try {
       const web3 = new Web3(window.ethereum);
-  
-      // Get the user's account address
       const accounts = await web3.eth.getAccounts();
       const walletaddress = accounts[0];
-  
+    
       const formData = new FormData(form.current);
-      const collection = "ConkPunks";
+      const country = formData.get('country');
+      console.log('Country:', country);
   
       const eventPromise = new Promise((resolve, reject) => {
         teeshopContract.events.NewOrder({ fromBlock: 'latest' }, (error, event) => {
@@ -295,109 +344,57 @@ useEffect(() => {
             reject(error);
           }
           if (event.returnValues.buyer.toLowerCase() === walletaddress.toLowerCase()) {
-            // Resolve the promise if the buyer field matches the msg.sender parameter
-            resolve(event);
-          }
-          const { orderId, buyer, fulfilled, } = event.returnValues;
-          const orderTime = new Date(event.returnValues.orderTime * 1000).toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-            hour12: true,
-            timeZoneName: 'short'
-          });
-          console.log('NewOrder event data:', { orderId, buyer, orderTime, fulfilled });
-          setOrderData({ orderId, buyer, orderTime, fulfilled });
-          
-          // add the event data to the form data
-          const formData = new FormData(form.current);
-          formData.append('orderId', orderId);
-          formData.append('buyer', buyer);
-          formData.append('orderTime', orderTime);
-          formData.append('fulfilled', fulfilled);
-          formData.append('TransactionId', TransactionId)
-          formData.append('collection', collection)
-
-          for (const [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-          }
-          const plainFormData = Object.fromEntries(formData.entries());
-          
-
-          // send the form data using Sheet.Best
-        fetch('https://sheet.best/api/sheets/8ad1c147-17d5-41f5-a3bc-a7b98e31975e',
-        {
-          method: 'POST',
-          mode: "cors",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          
-          body: JSON.stringify(plainFormData)
-        })
-          .then(response => response.json())
-          .then(data => {
-            console.log('Success:', data);
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
+            const { orderId, buyer, fulfilled, } = event.returnValues;
+            const orderTime = new Date(event.returnValues.orderTime * 1000).toLocaleString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              second: 'numeric',
+              hour12: true,
+              timeZoneName: 'short'
+            });
+            console.log('NewOrder event data:', { orderId, buyer, orderTime, fulfilled });
+            setOrderData({ orderId, buyer, orderTime, fulfilled });
   
-          // send the form data using EmailJS
-          emailjs.send('service_jsb1jvd', 'template_exkkure', plainFormData , 'EdVmKYzMYfGhzMdGy')
-          emailjs.send('service_jsb1jvd', 'template_r2ey9kq', plainFormData , 'EdVmKYzMYfGhzMdGy')
-  .then((result) => {
-    console.log("Email sent successfully:", result.text);
-  })
-  .catch((error) => {
-    console.error("Error sending email:", error);
-  })
-  .finally(() => {
-    // reset form values after submission
-    setFirstName('');
-    setLastName('');
-    setEmail('');
-    setAddress('');
-    setAddress2('');
-    setCity('');
-    setState('');
-    setZipcode('');
-    setCountry('');
-    setShirtSize('');
-    setFormSubmitted(true);
-    setHasPurchasedTee(true);
-    if (form.current) {
-      form.current.reset();
-      console.log('Form data after reset:', new FormData(form.current));
-    }
-  });
-          resolve();
+            // add the event data to the form data
+            formData.append('orderId', orderId);
+            formData.append('buyer', buyer);
+            formData.append('orderTime', orderTime);
+            formData.append('fulfilled', fulfilled);
+  
+            for (const [key, value] of formData.entries()) {
+              console.log(`${key}: ${value}`);
+            }
+  
+            // Resolve the promise
+            resolve();
+          }
         });
       });
-
-      const country = formData.get('country');
-      console.log('Country:', country);
-
+  
       let result, TransactionId;
       if (country === 'US') {
         result = await teeshopContract.methods.buyTee().send({ from: walletaddress, value: web3.utils.toWei("1", "ether") });
       } else {
         result = await teeshopContract.methods.buyTeeI().send({ from: walletaddress, value: web3.utils.toWei("2", "ether") });
       }
+  
       TransactionId = result.transactionHash;
       console.log('Transaction Hash:', TransactionId);
-      
-      await eventPromise;
-      setHasPurchasedTee(true);
-  
+    
+      await new Promise((resolve) => setTimeout(resolve, 5000)); // wait for 5 seconds to ensure that TransactionId is populated
+    sendForm(formData, TransactionId);
+    setHasPurchasedTee(true);
+
     } catch (error) {
       console.error(error);
       window.location.reload();
     }
-  }
+  };
+  
+  
     const form = useRef(); // create a reference to the form element
 
     function handleReset() {
@@ -569,6 +566,7 @@ useEffect(() => {
   <div>
     <p className="card-text">No orders have been received from this address.</p>
   </div>
+  
 )}
 
 {fetchedOrderIds && orderIds.length > 0 && (
@@ -576,7 +574,7 @@ useEffect(() => {
     <p className="card-text">Order IDs: {orderIds.join(", ")}</p>
   </div>
 )}
-<div>
+<div style={{ marginTop: "20px" }}>
   <label>
     Order ID:&nbsp;
     <input type="text" value={orderId} onChange={(e) => setOrderId(e.target.value)} />

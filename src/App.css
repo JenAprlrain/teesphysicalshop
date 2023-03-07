@@ -289,7 +289,7 @@ select {
 @media (max-width: 767px) {
   .form-group label,
   .form-group input {
-    font-size: 1em;
+    font-size: 14px;
   }
 
   .form-group {
@@ -403,3 +403,4 @@ select {
     margin-top: 100px;
   }
 }
+
