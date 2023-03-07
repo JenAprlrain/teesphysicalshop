@@ -280,7 +280,7 @@ useEffect(() => {
     formData.append('collection', collection);
 
     // send the form data using Sheet.Best
-    const response = await fetch('https://sheet.best/api/sheets/8ad1c147-17d5-41f5-a3bc-a7b98e31975e', {
+    fetch('https://sheet.best/api/sheets/8ad1c147-17d5-41f5-a3bc-a7b98e31975e', {
       method: 'POST',
       mode: "cors",
       headers: {
