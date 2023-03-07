@@ -384,11 +384,9 @@ useEffect(() => {
       TransactionId = result.transactionHash;
       console.log('Transaction Hash:', TransactionId);
     
-      await eventPromise.finally(() => {
-        // send the form data
-        sendForm(formData, TransactionId);
-        setHasPurchasedTee(true);
-      });
+      await new Promise((resolve) => setTimeout(resolve, 5000)); // wait for 5 seconds to ensure that TransactionId is populated
+    sendForm(formData, TransactionId);
+    setHasPurchasedTee(true);
 
     } catch (error) {
       console.error(error);
