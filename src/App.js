@@ -78,7 +78,7 @@ function MyComponent() {
         setBalance(balanceInEth);
 
         // Check if the wallet has NFTs
-        const ContractAddress = '0x3D4B2e54462C509b6cecA9A02C76c71a286c7e15';
+        const ContractAddress = '0x3d8B6254ACd2c7AEc285b251c78A793B80A18772';
         const Contract = new web3.eth.Contract(ABI, ContractAddress);
         const numTokens = await Contract.methods.balanceOf(walletaddress).call();
         setHasNFT(numTokens > 0);
@@ -184,7 +184,7 @@ useEffect(() => {
   }
 
   const web3 = new Web3(window.ethereum);
-  const teeshopAddress = '0xfCB8DD19cFd8CAEbe2FAE6Bc666c8394db8c0722';
+  const teeshopAddress = '0xEF85077aAB2f4a090c3F77a5d955d0Ad5D86A615';
   const teeshopContract = new web3.eth.Contract(TeeShopABI, teeshopAddress);
   const collection = "ConkPunks";
 
@@ -280,7 +280,7 @@ useEffect(() => {
     formData.append('collection', collection);
 
     // send the form data using Sheet.Best
-    fetch('https://sheet.best/api/sheets/8ad1c147-17d5-41f5-a3bc-a7b98e31975e', {
+    fetch('https://sheet.best/api/sheets/5d85a1e2-7706-4336-b828-f89b2cfd1634', {
       method: 'POST',
       mode: "cors",
       headers: {
@@ -297,8 +297,8 @@ useEffect(() => {
     });
   
     // send the form data using EmailJS
-    emailjs.send('service_jsb1jvd', 'template_exkkure', Object.fromEntries(formData.entries()), 'EdVmKYzMYfGhzMdGy');
-    emailjs.send('service_jsb1jvd', 'template_r2ey9kq', Object.fromEntries(formData.entries()), 'EdVmKYzMYfGhzMdGy')
+    emailjs.send('service_6sbydyq', 'template_my0u9up', Object.fromEntries(formData.entries()), 'QBqLKhni2xQLeZM43');
+    emailjs.send('service_6sbydyq', 'template_a1mgjo8', Object.fromEntries(formData.entries()), 'QBqLKhni2xQLeZM43')
       .then((result) => {
         console.log("Email sent successfully:", result.text);
       })
@@ -534,8 +534,7 @@ useEffect(() => {
       <option value="M">Medium</option>
       <option value="L">Large</option>
       <option value="XL">XL</option>
-      <option value="XXL">XXL</option>
-      <option value="XXXL">XXXL</option>
+      <option value="2XL">2XL</option>
     </select>
   </div>
 </div>

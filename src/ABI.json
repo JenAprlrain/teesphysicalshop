@@ -2,24 +2,14 @@
 	{
 	   "inputs":[
 		  {
-			 "internalType":"string",
-			 "name":"_name",
-			 "type":"string"
+			 "internalType":"address[]",
+			 "name":"_devList",
+			 "type":"address[]"
 		  },
 		  {
-			 "internalType":"string",
-			 "name":"_symbol",
-			 "type":"string"
-		  },
-		  {
-			 "internalType":"string",
-			 "name":"_initBaseURI",
-			 "type":"string"
-		  },
-		  {
-			 "internalType":"string",
-			 "name":"_initNotRevealedUri",
-			 "type":"string"
+			 "internalType":"uint256[]",
+			 "name":"_fees",
+			 "type":"uint256[]"
 		  }
 	   ],
 	   "stateMutability":"nonpayable",
@@ -81,6 +71,25 @@
 		  {
 			 "indexed":true,
 			 "internalType":"address",
+			 "name":"_to",
+			 "type":"address"
+		  },
+		  {
+			 "indexed":true,
+			 "internalType":"uint256",
+			 "name":"_tokenId",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"Migration",
+	   "type":"event"
+	},
+	{
+	   "anonymous":false,
+	   "inputs":[
+		  {
+			 "indexed":true,
+			 "internalType":"address",
 			 "name":"previousOwner",
 			 "type":"address"
 		  },
@@ -92,6 +101,19 @@
 		  }
 	   ],
 	   "name":"OwnershipTransferred",
+	   "type":"event"
+	},
+	{
+	   "anonymous":false,
+	   "inputs":[
+		  {
+			 "indexed":false,
+			 "internalType":"address",
+			 "name":"account",
+			 "type":"address"
+		  }
+	   ],
+	   "name":"Paused",
 	   "type":"event"
 	},
 	{
@@ -120,19 +142,101 @@
 	   "type":"event"
 	},
 	{
+	   "anonymous":false,
 	   "inputs":[
 		  {
+			 "indexed":false,
 			 "internalType":"address",
-			 "name":"",
+			 "name":"account",
 			 "type":"address"
 		  }
 	   ],
-	   "name":"addressMintedBalance",
+	   "name":"Unpaused",
+	   "type":"event"
+	},
+	{
+	   "anonymous":false,
+	   "inputs":[
+		  {
+			 "indexed":true,
+			 "internalType":"address",
+			 "name":"devAddress",
+			 "type":"address"
+		  },
+		  {
+			 "indexed":false,
+			 "internalType":"uint256",
+			 "name":"amount",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"WithdrawFees",
+	   "type":"event"
+	},
+	{
+	   "anonymous":false,
+	   "inputs":[
+		  {
+			 "indexed":true,
+			 "internalType":"address",
+			 "name":"devAddress",
+			 "type":"address"
+		  },
+		  {
+			 "indexed":false,
+			 "internalType":"address",
+			 "name":"tokenAddress",
+			 "type":"address"
+		  },
+		  {
+			 "indexed":false,
+			 "internalType":"uint256",
+			 "name":"tokenId",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"WithdrawWrongNfts",
+	   "type":"event"
+	},
+	{
+	   "anonymous":false,
+	   "inputs":[
+		  {
+			 "indexed":true,
+			 "internalType":"address",
+			 "name":"devAddress",
+			 "type":"address"
+		  },
+		  {
+			 "indexed":false,
+			 "internalType":"address",
+			 "name":"tokenAddress",
+			 "type":"address"
+		  },
+		  {
+			 "indexed":false,
+			 "internalType":"uint256",
+			 "name":"amount",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"WithdrawWrongTokens",
+	   "type":"event"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"address",
+			 "name":"_owner",
+			 "type":"address"
+		  }
+	   ],
+	   "name":"Owned",
 	   "outputs":[
 		  {
-			 "internalType":"uint256",
+			 "internalType":"uint256[]",
 			 "name":"",
-			 "type":"uint256"
+			 "type":"uint256[]"
 		  }
 	   ],
 	   "stateMutability":"view",
@@ -209,14 +313,64 @@
 	},
 	{
 	   "inputs":[
+		  {
+			 "internalType":"uint256",
+			 "name":"tokenId",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"burn",
+	   "outputs":[
 		  
 	   ],
-	   "name":"cost",
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"address",
+			 "name":"",
+			 "type":"address"
+		  }
+	   ],
+	   "name":"devFees",
 	   "outputs":[
 		  {
 			 "internalType":"uint256",
-			 "name":"",
+			 "name":"percent",
 			 "type":"uint256"
+		  },
+		  {
+			 "internalType":"uint256",
+			 "name":"amount",
+			 "type":"uint256"
+		  }
+	   ],
+	   "stateMutability":"view",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  
+	   ],
+	   "name":"emergencyWithdraw",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  
+	   ],
+	   "name":"erc20Token",
+	   "outputs":[
+		  {
+			 "internalType":"contract IERC20",
+			 "name":"",
+			 "type":"address"
 		  }
 	   ],
 	   "stateMutability":"view",
@@ -267,18 +421,14 @@
 	},
 	{
 	   "inputs":[
-		  {
-			 "internalType":"address",
-			 "name":"_user",
-			 "type":"address"
-		  }
+		  
 	   ],
-	   "name":"isWhitelisted",
+	   "name":"maxPerPerson",
 	   "outputs":[
 		  {
-			 "internalType":"bool",
+			 "internalType":"uint256",
 			 "name":"",
-			 "type":"bool"
+			 "type":"uint256"
 		  }
 	   ],
 	   "stateMutability":"view",
@@ -288,7 +438,7 @@
 	   "inputs":[
 		  
 	   ],
-	   "name":"maxMintAmount",
+	   "name":"maxPerTx",
 	   "outputs":[
 		  {
 			 "internalType":"uint256",
@@ -318,7 +468,7 @@
 	   "inputs":[
 		  {
 			 "internalType":"uint256",
-			 "name":"_mintAmount",
+			 "name":"amount",
 			 "type":"uint256"
 		  }
 	   ],
@@ -326,7 +476,7 @@
 	   "outputs":[
 		  
 	   ],
-	   "stateMutability":"payable",
+	   "stateMutability":"nonpayable",
 	   "type":"function"
 	},
 	{
@@ -339,51 +489,6 @@
 			 "internalType":"string",
 			 "name":"",
 			 "type":"string"
-		  }
-	   ],
-	   "stateMutability":"view",
-	   "type":"function"
-	},
-	{
-	   "inputs":[
-		  
-	   ],
-	   "name":"nftPerAddressLimit",
-	   "outputs":[
-		  {
-			 "internalType":"uint256",
-			 "name":"",
-			 "type":"uint256"
-		  }
-	   ],
-	   "stateMutability":"view",
-	   "type":"function"
-	},
-	{
-	   "inputs":[
-		  
-	   ],
-	   "name":"notRevealedUri",
-	   "outputs":[
-		  {
-			 "internalType":"string",
-			 "name":"",
-			 "type":"string"
-		  }
-	   ],
-	   "stateMutability":"view",
-	   "type":"function"
-	},
-	{
-	   "inputs":[
-		  
-	   ],
-	   "name":"onlyWhitelisted",
-	   "outputs":[
-		  {
-			 "internalType":"bool",
-			 "name":"",
-			 "type":"bool"
 		  }
 	   ],
 	   "stateMutability":"view",
@@ -425,21 +530,6 @@
 	},
 	{
 	   "inputs":[
-		  {
-			 "internalType":"bool",
-			 "name":"_state",
-			 "type":"bool"
-		  }
-	   ],
-	   "name":"pause",
-	   "outputs":[
-		  
-	   ],
-	   "stateMutability":"nonpayable",
-	   "type":"function"
-	},
-	{
-	   "inputs":[
 		  
 	   ],
 	   "name":"paused",
@@ -457,6 +547,36 @@
 	   "inputs":[
 		  
 	   ],
+	   "name":"price",
+	   "outputs":[
+		  {
+			 "internalType":"uint256",
+			 "name":"",
+			 "type":"uint256"
+		  }
+	   ],
+	   "stateMutability":"view",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"address[]",
+			 "name":"addressList",
+			 "type":"address[]"
+		  }
+	   ],
+	   "name":"removeWhiteList",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  
+	   ],
 	   "name":"renounceOwnership",
 	   "outputs":[
 		  
@@ -468,26 +588,74 @@
 	   "inputs":[
 		  
 	   ],
-	   "name":"reveal",
+	   "name":"royalty",
 	   "outputs":[
-		  
+		  {
+			 "internalType":"uint256",
+			 "name":"",
+			 "type":"uint256"
+		  }
 	   ],
-	   "stateMutability":"nonpayable",
+	   "stateMutability":"view",
 	   "type":"function"
 	},
 	{
 	   "inputs":[
 		  
 	   ],
-	   "name":"revealed",
+	   "name":"royaltyAddress",
 	   "outputs":[
 		  {
-			 "internalType":"bool",
+			 "internalType":"address",
 			 "name":"",
-			 "type":"bool"
+			 "type":"address"
 		  }
 	   ],
 	   "stateMutability":"view",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"uint256",
+			 "name":"",
+			 "type":"uint256"
+		  },
+		  {
+			 "internalType":"uint256",
+			 "name":"_salePrice",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"royaltyInfo",
+	   "outputs":[
+		  {
+			 "internalType":"address",
+			 "name":"receiver",
+			 "type":"address"
+		  },
+		  {
+			 "internalType":"uint256",
+			 "name":"royaltyAmount",
+			 "type":"uint256"
+		  }
+	   ],
+	   "stateMutability":"view",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"address",
+			 "name":"to",
+			 "type":"address"
+		  }
+	   ],
+	   "name":"safeMint",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
 	   "type":"function"
 	},
 	{
@@ -534,7 +702,7 @@
 		  },
 		  {
 			 "internalType":"bytes",
-			 "name":"data",
+			 "name":"_data",
 			 "type":"bytes"
 		  }
 	   ],
@@ -569,22 +737,7 @@
 	   "inputs":[
 		  {
 			 "internalType":"string",
-			 "name":"_newBaseExtension",
-			 "type":"string"
-		  }
-	   ],
-	   "name":"setBaseExtension",
-	   "outputs":[
-		  
-	   ],
-	   "stateMutability":"nonpayable",
-	   "type":"function"
-	},
-	{
-	   "inputs":[
-		  {
-			 "internalType":"string",
-			 "name":"_newBaseURI",
+			 "name":"newBaseURI",
 			 "type":"string"
 		  }
 	   ],
@@ -598,12 +751,12 @@
 	{
 	   "inputs":[
 		  {
-			 "internalType":"uint256",
-			 "name":"_newCost",
-			 "type":"uint256"
+			 "internalType":"contract IERC20",
+			 "name":"newToken",
+			 "type":"address"
 		  }
 	   ],
-	   "name":"setCost",
+	   "name":"setERC20Token",
 	   "outputs":[
 		  
 	   ],
@@ -614,11 +767,11 @@
 	   "inputs":[
 		  {
 			 "internalType":"uint256",
-			 "name":"_limit",
+			 "name":"newMaxBuy",
 			 "type":"uint256"
 		  }
 	   ],
-	   "name":"setNftPerAddressLimit",
+	   "name":"setMaxPerPerson",
 	   "outputs":[
 		  
 	   ],
@@ -627,43 +780,78 @@
 	},
 	{
 	   "inputs":[
+		  {
+			 "internalType":"uint256",
+			 "name":"newMaxBuy",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"setMaxPerTx",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"uint256",
+			 "name":"newPrice",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"setPrice",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"uint16",
+			 "name":"_royalty",
+			 "type":"uint16"
+		  }
+	   ],
+	   "name":"setRoyalty",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"address",
+			 "name":"_royaltyAddress",
+			 "type":"address"
+		  }
+	   ],
+	   "name":"setRoyaltyAddress",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"uint256",
+			 "name":"tokenId",
+			 "type":"uint256"
+		  },
 		  {
 			 "internalType":"string",
-			 "name":"_notRevealedURI",
+			 "name":"uri",
 			 "type":"string"
 		  }
 	   ],
-	   "name":"setNotRevealedURI",
-	   "outputs":[
-		  
-	   ],
-	   "stateMutability":"nonpayable",
-	   "type":"function"
-	},
-	{
-	   "inputs":[
-		  {
-			 "internalType":"bool",
-			 "name":"_state",
-			 "type":"bool"
-		  }
-	   ],
-	   "name":"setOnlyWhitelisted",
-	   "outputs":[
-		  
-	   ],
-	   "stateMutability":"nonpayable",
-	   "type":"function"
-	},
-	{
-	   "inputs":[
-		  {
-			 "internalType":"uint256",
-			 "name":"_newmaxMintAmount",
-			 "type":"uint256"
-		  }
-	   ],
-	   "name":"setmaxMintAmount",
+	   "name":"setURI",
 	   "outputs":[
 		  
 	   ],
@@ -718,6 +906,25 @@
 			 "internalType":"uint256",
 			 "name":"",
 			 "type":"uint256"
+		  }
+	   ],
+	   "stateMutability":"view",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"uint256",
+			 "name":"_id",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"tokenExists",
+	   "outputs":[
+		  {
+			 "internalType":"bool",
+			 "name":"",
+			 "type":"bool"
 		  }
 	   ],
 	   "stateMutability":"view",
@@ -823,32 +1030,20 @@
 	},
 	{
 	   "inputs":[
-		  {
-			 "internalType":"address",
-			 "name":"_owner",
-			 "type":"address"
-		  }
+		  
 	   ],
-	   "name":"walletOfOwner",
+	   "name":"updatePausedStatus",
 	   "outputs":[
-		  {
-			 "internalType":"uint256[]",
-			 "name":"",
-			 "type":"uint256[]"
-		  }
+		  
 	   ],
-	   "stateMutability":"view",
+	   "stateMutability":"nonpayable",
 	   "type":"function"
 	},
 	{
 	   "inputs":[
-		  {
-			 "internalType":"address[]",
-			 "name":"_users",
-			 "type":"address[]"
-		  }
+		  
 	   ],
-	   "name":"whitelistUsers",
+	   "name":"updateWhitelistStatus",
 	   "outputs":[
 		  
 	   ],
@@ -858,17 +1053,52 @@
 	{
 	   "inputs":[
 		  {
+			 "internalType":"address[]",
+			 "name":"_addressList",
+			 "type":"address[]"
+		  },
+		  {
+			 "internalType":"uint256",
+			 "name":"count",
+			 "type":"uint256"
+		  }
+	   ],
+	   "name":"whiteList",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"address",
+			 "name":"",
+			 "type":"address"
+		  }
+	   ],
+	   "name":"whiteListed",
+	   "outputs":[
+		  {
 			 "internalType":"uint256",
 			 "name":"",
 			 "type":"uint256"
 		  }
 	   ],
-	   "name":"whitelistedAddresses",
+	   "stateMutability":"view",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  
+	   ],
+	   "name":"whitelistedOnly",
 	   "outputs":[
 		  {
-			 "internalType":"address",
+			 "internalType":"bool",
 			 "name":"",
-			 "type":"address"
+			 "type":"bool"
 		  }
 	   ],
 	   "stateMutability":"view",
@@ -882,7 +1112,42 @@
 	   "outputs":[
 		  
 	   ],
-	   "stateMutability":"payable",
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"address",
+			 "name":"_tokenContract",
+			 "type":"address"
+		  },
+		  {
+			 "internalType":"uint256[]",
+			 "name":"_id",
+			 "type":"uint256[]"
+		  }
+	   ],
+	   "name":"withdrawNFT",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
+	   "type":"function"
+	},
+	{
+	   "inputs":[
+		  {
+			 "internalType":"address",
+			 "name":"_tokenContract",
+			 "type":"address"
+		  }
+	   ],
+	   "name":"withdrawTokens",
+	   "outputs":[
+		  
+	   ],
+	   "stateMutability":"nonpayable",
 	   "type":"function"
 	}
  ]
