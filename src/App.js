@@ -369,7 +369,7 @@ useEffect(() => {
             }
   
             // Resolve the promise
-            resolve();
+            setTimeout(resolve, 5000);
           }
         });
       });
