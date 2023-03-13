@@ -13,6 +13,8 @@ import logo from './images/logo.png';
 import emailjs from "emailjs-com";
 import { countryOptions } from './countries';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import * as Sentry from "@sentry/react";
+import { BrowserTracing } from "@sentry/tracing";
 
 
 function MyComponent() {
@@ -48,7 +50,11 @@ function MyComponent() {
   const [fetchedOrderIds, setFetchedOrderIds] = useState(false);
   const [orderStatusNotFound, setOrderStatusNotFound] = useState(false);
 
-
+  Sentry.init({
+    dsn: "https://84fc864e858d40fca6116704b9af3e43@o4504831868076032.ingest.sentry.io/4504831870959616",
+    integrations: [new BrowserTracing()],
+    tracesSampleRate: 1.0,
+  });
 
   useEffect(() => {
     if (Contract) {
@@ -353,7 +359,7 @@ useEffect(() => {
       console.log('Transaction receipt:', receipt);
 
       // Wait for a few seconds before retrieving the latest order ID
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise(resolve => setTimeout(resolve, 10000));
   
       // Get the latest order ID for the buyer
       const orderIds = await teeshopContract.methods.getOrdersByBuyer(walletaddress).call();
