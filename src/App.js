@@ -551,7 +551,7 @@ useEffect(() => {
       <option value="M">Medium</option>
       <option value="L">Large</option>
       <option value="XL">XL</option>
-      <option value="2XL">XXL</option>
+      <option value="XXL">2XL</option>
     </select>
   </div>
 </div>
