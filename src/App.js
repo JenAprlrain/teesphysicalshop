@@ -198,7 +198,9 @@ useEffect(() => {
       const InternationalPriceInEth = web3.utils.fromWei(InternationalpriceInWei, 'ether');
       setInternationalPrice(InternationalPriceInEth);
       console.log ('International price:',InternationalPriceInEth)
-  
+
+      return { priceInWei, InternationalpriceInWei };
+
     } catch (error) {
       // Handle any errors
     }
@@ -330,19 +332,22 @@ useEffect(() => {
       const accounts = await web3.eth.getAccounts();
       const walletaddress = accounts[0];
 
+      const { priceInWei, InternationalpriceInWei } = await fetchPrice();
+
       const gasPrice = web3.utils.toWei('200', 'gwei'); // set the gas price to 200 gwei
 
       const options = {
-      from: walletaddress,
-      value: web3.utils.toWei('1', 'ether'),
-      gasPrice: gasPrice
+        from: walletaddress,
+        value: priceInWei,
+        gasPrice: gasPrice
       };
-
+  
       const intoptions = {
         from: walletaddress,
-        value: web3.utils.toWei('2', 'ether'),
+        value: InternationalpriceInWei,
         gasPrice: gasPrice
-        };
+      };
+  
   
       const formData = new FormData(form.current);
       const country = formData.get('country');
