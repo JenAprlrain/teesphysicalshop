@@ -329,6 +329,20 @@ useEffect(() => {
       const web3 = new Web3(window.ethereum);
       const accounts = await web3.eth.getAccounts();
       const walletaddress = accounts[0];
+
+      const gasPrice = web3.utils.toWei('200', 'gwei'); // set the gas price to 200 gwei
+
+      const options = {
+      from: walletaddress,
+      value: web3.utils.toWei('1', 'ether'),
+      gasPrice: gasPrice
+      };
+
+      const intoptions = {
+        from: walletaddress,
+        value: web3.utils.toWei('2', 'ether'),
+        gasPrice: gasPrice
+        };
   
       const formData = new FormData(form.current);
       const country = formData.get('country');
@@ -337,9 +351,9 @@ useEffect(() => {
       // Buy the tee and get the transaction hash
       let result, TransactionId;
       if (country === 'US') {
-        result = await teeshopContract.methods.buyTee().send({ from: walletaddress, value: web3.utils.toWei("1", "ether") });
+        result = await teeshopContract.methods.buyTee().send(options);
       } else {
-        result = await teeshopContract.methods.buyTeeI().send({ from: walletaddress, value: web3.utils.toWei("2", "ether") });
+        result = await teeshopContract.methods.buyTeeI().send(intoptions);
       }
       TransactionId = result.transactionHash;
       console.log('Transaction Hash:', TransactionId);
