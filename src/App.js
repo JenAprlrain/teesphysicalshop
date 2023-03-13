@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, } from 'react';
+import ReactDOM from 'react-dom';
 import Web3 from 'web3';
 import ABI from './ABI.json';
 import TeeShopABI from './TeeShopABI.json';
@@ -13,9 +14,6 @@ import logo from './images/logo.png';
 import emailjs from "emailjs-com";
 import { countryOptions } from './countries';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import Bugsnag from '@bugsnag/js'
-import BugsnagPluginReact from '@bugsnag/plugin-react'
-
 
 function MyComponent() {
   const [account, setAccount] = useState('');
@@ -50,11 +48,6 @@ function MyComponent() {
   const [fetchedOrderIds, setFetchedOrderIds] = useState(false);
   const [orderStatusNotFound, setOrderStatusNotFound] = useState(false);
 
-  Bugsnag.start({
-    apiKey: 'adf5268c386b207e6c1e46e1fdf81f7b',
-    plugins: [new BugsnagPluginReact()]
-  })
-
   useEffect(() => {
     if (Contract) {
       fetchOwnedNFTs();
@@ -64,20 +57,7 @@ function MyComponent() {
   const toggleBalanceVisibility = () => {
     setShowBalance(!showBalance);
   };
-  
-  const ErrorBoundary = Bugsnag.getPlugin('react')
-  .createErrorBoundary(React)
 
-  ReactDOM.render(
-    <ErrorBoundary client={bugsnagClient}>
-      <MyComponent />
-    </ErrorBoundary>,
-    document.getElementById('root')
-
-  );
-
-  Bugsnag.notify(new Error('Test error'))
-  
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
       try {
@@ -120,8 +100,6 @@ function MyComponent() {
       setHaveMetamask(false);
     }
   };
-
-  
 
   async function fetchOwnedNFTs() {
     console.log("fetchOwnedNFTs function is called");
@@ -642,6 +620,8 @@ useEffect(() => {
       </div>
   )}
 </div>
+
 );
 }
+
 export default MyComponent;
