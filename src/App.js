@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, } from 'react';
 import Web3 from 'web3';
 import ABI from './ABI.json';
 import TeeShopABI from './TeeShopABI.json';
