@@ -13,8 +13,8 @@ import logo from './images/logo.png';
 import emailjs from "emailjs-com";
 import { countryOptions } from './countries';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import * as Sentry from "@sentry/react";
-import { BrowserTracing } from "@sentry/tracing";
+import Bugsnag from '@bugsnag/js'
+import BugsnagPluginReact from '@bugsnag/plugin-react'
 
 
 function MyComponent() {
@@ -50,11 +50,10 @@ function MyComponent() {
   const [fetchedOrderIds, setFetchedOrderIds] = useState(false);
   const [orderStatusNotFound, setOrderStatusNotFound] = useState(false);
 
-  Sentry.init({
-    dsn: "https://84fc864e858d40fca6116704b9af3e43@o4504831868076032.ingest.sentry.io/4504831870959616",
-    integrations: [new BrowserTracing()],
-    tracesSampleRate: 1.0,
-  });
+  Bugsnag.start({
+    apiKey: 'adf5268c386b207e6c1e46e1fdf81f7b',
+    plugins: [new BugsnagPluginReact()]
+  })
 
   useEffect(() => {
     if (Contract) {
@@ -65,6 +64,19 @@ function MyComponent() {
   const toggleBalanceVisibility = () => {
     setShowBalance(!showBalance);
   };
+  
+  const ErrorBoundary = Bugsnag.getPlugin('react')
+  .createErrorBoundary(React)
+
+  ReactDOM.render(
+    <ErrorBoundary client={bugsnagClient}>
+      <MyComponent />
+    </ErrorBoundary>,
+    document.getElementById('root')
+
+  );
+
+  Bugsnag.notify(new Error('Test error'))
   
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
