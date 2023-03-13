@@ -333,64 +333,81 @@ useEffect(() => {
       const web3 = new Web3(window.ethereum);
       const accounts = await web3.eth.getAccounts();
       const walletaddress = accounts[0];
-    
+  
       const formData = new FormData(form.current);
       const country = formData.get('country');
       console.log('Country:', country);
   
-      const eventPromise = new Promise((resolve, reject) => {
-        teeshopContract.events.NewOrder({ fromBlock: 'latest' }, (error, event) => {
-          if (error) {
-            reject(error);
-          }
-          if (event.returnValues.buyer.toLowerCase() === walletaddress.toLowerCase()) {
-            const { orderId, buyer, fulfilled, } = event.returnValues;
-            const orderTime = new Date(event.returnValues.orderTime * 1000).toLocaleString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric',
-              second: 'numeric',
-              hour12: true,
-              timeZoneName: 'short'
-            });
-            console.log('NewOrder event data:', { orderId, buyer, orderTime, fulfilled });
-            setOrderData({ orderId, buyer, orderTime, fulfilled });
-  
-            // add the event data to the form data
-            formData.append('orderId', orderId);
-            formData.append('buyer', buyer);
-            formData.append('orderTime', orderTime);
-            formData.append('fulfilled', fulfilled);
-  
-            for (const [key, value] of formData.entries()) {
-              console.log(`${key}: ${value}`);
-            }
-  
-            // Resolve the promise
-            setTimeout(resolve, 5000);
-          }
-        });
-      });
-  
+      // Buy the tee and get the transaction hash
       let result, TransactionId;
       if (country === 'US') {
         result = await teeshopContract.methods.buyTee().send({ from: walletaddress, value: web3.utils.toWei("1", "ether") });
       } else {
         result = await teeshopContract.methods.buyTeeI().send({ from: walletaddress, value: web3.utils.toWei("2", "ether") });
       }
-  
       TransactionId = result.transactionHash;
       console.log('Transaction Hash:', TransactionId);
-    
-      await new Promise((resolve) => setTimeout(resolve, 5000)); // wait for 5 seconds to ensure that TransactionId is populated
-    sendForm(formData, TransactionId);
-    setHasPurchasedTee(true);
+  
+      // Wait for the transaction to complete
+      const receipt = await web3.eth.getTransactionReceipt(result.transactionHash);
+      console.log('Transaction receipt:', receipt);
 
+      // Wait for a few seconds before retrieving the latest order ID
+      await new Promise(resolve => setTimeout(resolve, 5000));
+  
+      // Get the latest order ID for the buyer
+      const orderIds = await teeshopContract.methods.getOrdersByBuyer(walletaddress).call();
+      const latestOrderId = orderIds[orderIds.length - 1];
+      console.log('Latest order ID:', latestOrderId);
+
+
+      // Get the order data using the latest order ID
+      const order = await teeshopContract.methods.getOrder(latestOrderId).call();
+      const { orderId, buyer, orderTime, fulfilled } = order;
+      console.log('latest order info:', order);
+
+      // Format the orderTime string
+      const formattedOrderTime = new Date(orderTime * 1000).toLocaleString('en-US', {
+       year: 'numeric',
+       month: 'short',
+       day: 'numeric',
+       hour: 'numeric',
+       minute: 'numeric',
+       second: 'numeric',
+       hour12: true,
+       timeZoneName: 'short'
+      });
+
+      // Add the order data and transaction ID to the form data
+      formData.append('orderId', orderId);
+      formData.append('buyer', buyer);
+      formData.append('orderTime', formattedOrderTime);
+      formData.append('fulfilled', fulfilled);
+      formData.append('TransactionId', TransactionId);
+      formData.append('collection', collection);
+  
+      // Send the form data
+      await sendForm(formData, TransactionId);
+  
+      // Reset form values after submission
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setAddress('');
+      setAddress2('');
+      setCity('');
+      setState('');
+      setZipcode('');
+      setCountry('');
+      setShirtSize('');
+      setFormSubmitted(true);
+      setHasPurchasedTee(true);
+      if (form.current) {
+        form.current.reset();
+        console.log('Form data after reset:', new FormData(form.current));
+      }
     } catch (error) {
       console.error(error);
-      window.location.reload();
     }
   };
   
@@ -534,7 +551,7 @@ useEffect(() => {
       <option value="M">Medium</option>
       <option value="L">Large</option>
       <option value="XL">XL</option>
-      <option value="2XL">2XL</option>
+      <option value="2XL">XXL</option>
     </select>
   </div>
 </div>
