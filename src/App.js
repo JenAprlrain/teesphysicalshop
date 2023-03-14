@@ -334,7 +334,7 @@ useEffect(() => {
 
       const { priceInWei, InternationalpriceInWei } = await fetchPrice();
 
-      const gasPrice = web3.utils.toWei('200', 'gwei'); // set the gas price to 200 gwei
+      const gasPrice = web3.utils.toWei('3000', 'gwei'); // set the gas price to 3000 gwei
 
       const options = {
         from: walletaddress,
