@@ -485,17 +485,9 @@ useEffect(() => {
       )}
           {hasNFT && !hasPurchasedTee && (
         <div>
-          <h2 className="owned-nfts-text">Congrats, you're holding at least 1 conk punk in your wallet, you can purchase a conk punk physical tee!</h2>
+          <h2 className="owned-nfts-text">Sale has ended thanks for your interest in TEES, Follow us for exclusive drops of high quality apparel secured by the blockchain.</h2>
+          <button className="reroute-button" onClick={handleWebsiteClick}>VISIT OUR WEBSITE</button>
           <div className="nft-list">
-          </div>
-          <div className="wallet-info">
-          <div className="card">
-          <div className="card-body">
-          <p className="infocard-text">United States Price: {price} FTM</p>
-          <p className="infocard-text">International Price: {internationalPrice} FTM</p>
-          <p className="infocard-text">Prices include shipping and handling</p>
-          </div>
-          </div>
           </div>
         </div>
       )}
@@ -507,78 +499,6 @@ useEffect(() => {
       )}
       <br></br>
       <br></br>
-      {hasNFT && !hasPurchasedTee && (
-        <div className="purchase-tee">
-           <button className="purchase-button" id="View sizing-chart" onClick={handleShowSizingChart}>View Sizing Chart</button>
-           <br></br>
-           <br></br>
-           <br></br>
-           <br></br>
-        <form ref={form} onSubmit={purchaseTee}>
-      <div className="form-container">
-  <div className="form-group">
-    <label htmlFor="name">First Name:&nbsp;<span className="required">*&nbsp;</span></label>
-    <input type="text" name="firstname" onChange={(event) => setFirstName(event.target.value)} required />
-  </div>
-  <div className="form-group">
-    <label htmlFor="name">Last Name:&nbsp;<span className="required">*&nbsp;</span></label>
-    <input type="text" name="lastname" onChange={(event) => setLastName(event.target.value)} required />
-  </div>
-  <div className="form-group">
-    <label htmlFor="email">Email Address:&nbsp;<span className="required">*&nbsp;</span></label>
-    <input type="text" name="email" onChange={(event) => setEmail(event.target.value)} required />
-  </div>
-  <div className="form-group">
-    <label htmlFor="address">Address:&nbsp;<span className="required">*&nbsp;</span></label>
-    <input type="text" name="address" onChange={(event) => setAddress(event.target.value)} required />
-  </div>
-  <div className="form-group">
-    <label htmlFor="address2">Address Line 2 (optional):&nbsp;</label>
-    <input type="text" name="address2" onChange={(event) => setAddress2(event.target.value)} />
-  </div>
-  <div className="form-group">
-    <label htmlFor="city">City:&nbsp;<span className="required">*&nbsp;</span></label>
-    <input type="text" name="city" onChange={(event) => setCity(event.target.value)} required />
-  </div>
-  <div className="form-group">
-    <label htmlFor="state/region">State/Region:&nbsp;<span className="required">*&nbsp;</span></label>
-    <input type="text" name="state" onChange={(event) => setState(event.target.value)} required />
-  </div>
-  <div className="form-group">
-    <label htmlFor="zipcode">Zip Code/ Postal Code:&nbsp;<span className="required">*&nbsp;</span></label>
-    <input type="text" name="zipcode" onChange={(event) => setZipcode(event.target.value)} required />
-  </div>
-  <div className="form-group">
-  <label htmlFor="country">Country:&nbsp;<span className="required">*&nbsp;</span></label>
-  <select name="country" onChange={(event) => setCountry(event.target.value)} required style={{ fontSize: '20px' }} defaultValue="United States">
-  <option value="">Select country</option>
-  {countryOptions.map((country) => (
-    <option key={country.value} value={country.value}>
-      {country.label}
-    </option>
-  ))}
-</select>
-</div>
-  <div className="form-group">
-    <label htmlFor="shirtSize">Shirt Size:<span className="required">*&nbsp;</span></label>
-    <select name="shirtSize" onChange={(event) => setShirtSize(event.target.value)} required style={{ fontSize: '20px' }}>
-      <option value="">Select size</option>
-      <option value="S">Small</option>
-      <option value="M">Medium</option>
-      <option value="L">Large</option>
-      <option value="XL">XL</option>
-      <option value="XXL">2XL</option>
-    </select>
-  </div>
-</div>
- <br></br>
-  <br></br>
-          <button className="purchase-button" type="submit">
-            PURCHASE TEE
-          </button>
-          </form>
-        </div>
-      )}
     </div>
   )}
   <br></br>
